@@ -6,16 +6,3 @@ As part of the Full-Stack Udacity Nanodegree Capstone final project, the scope o
 
 By completing this project, the student will have had the opportunity to implement all concepts learned throughout the program, which include architecting relational database models in Python, utilizing SQLAlchemy to conduct database queries, following RESTful principles of API development, structuring endpoints to respond to HTTP methods, including error handling, enabling role based authentication and roles-based access control with Autho0 (third-party authentication software as a service API), hosting the application live via Heroku, executing unit test, creating requirements, and documentation of a web API.
 
-
-## About the Stack 
-
-
-### Backend
-
-The ./backend directory contains the completed Flask server. 
-
-View the README.md within the ./backend for more details.
-
-### Frontend
-
-The ./frontend directory is empty and is not supported
