@@ -1,0 +1,10 @@
+version: "3"
+services:
+  web:
+    build: .
+    image: myimage_latest
+    container_name: myContainer_latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
