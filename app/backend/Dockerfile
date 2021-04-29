@@ -8,5 +8,6 @@ COPY . /app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# $PORT is set by Heroku
-CMD gunicorn --bind 0.0.0.0:$PORT flaskr:app
+# Deployment development: $PORT is set by Heroku
+# Local development: $PORT is set by docker-compose
+CMD gunicorn --bind 0.0.0.0:$PORT "flaskr:create_app()"
