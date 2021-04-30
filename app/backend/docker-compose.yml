@@ -2,11 +2,17 @@ version: "3"
 services:
   web:
     build: .
-    image: myimage_latest
-    container_name: myContainer_latest
+    image: web_image_latest
+    container_name: web_container_latest
     env_file:
-      - .env_file
+      - .env
     ports:
-      - "8080:8080"
+      -  ${PORT}:${PORT}
     volumes:
       - .:/app
+  db:
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}

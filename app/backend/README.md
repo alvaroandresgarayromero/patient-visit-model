@@ -91,3 +91,16 @@ Docker and Heroku are utilized for Continuous Integration and Development (CI/CD
 
 
 
+#### Database is hosted on Heroku
+
+- Create Postgres database 
+  
+    ```bash
+    $ sudo heroku addons:create heroku-postgresql:hobby-dev --app patient-visit-model
+    ```
+- Verify DATABASE_URL exists - the app uses this URL to access the database.
+
+    ```bash
+    # Verify DATABASE_URL exists - the app uses this URL to access the database.
+    $ sudo heroku config --app patient-visit-model
+    ```

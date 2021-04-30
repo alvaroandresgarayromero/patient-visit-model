@@ -3,12 +3,16 @@ from .models import *
 from .auth import *
 
 
+POSTGRES_PORT = os.environ.get('POSTGRES_USER', 'none')
+
+
 def create_app():
     app = Flask(__name__)
+    #setup_db(app)
 
     @app.route('/', methods=['POST', 'GET'])
     def health():
-        return jsonify({'success': True})
+        return jsonify({'success': POSTGRES_PORT})
 
     return app
 
