@@ -1,36 +1,39 @@
-import os
 from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
-import json
+from . import config
+from .logprint import _logger
 
-
-POSTGRES_DB = os.environ.get('POSTGRES_DB', None)
-POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD', None)
-POSTGRES_USER = os.environ.get('POSTGRES_USER', None)
-POSTGRES_PORT = os.environ.get('POSTGRES_PORT', None)
-
-
-
-database_path = "postgresql://{}:{}@localhost:{}/{}".format(POSTGRES_USER,
-                                                            POSTGRES_PASSWORD,
-                                                            POSTGRES_PORT,
-                                                            POSTGRES_DB)
-
+LOG = _logger()
 
 db = SQLAlchemy()
 
-
-# psql -h localhost -p 5432 -d patientnursedb -U postgres --password
 
 """
 setup_db(app)
     binds a flask application and a SQLAlchemy service
 """
-def setup_db(app, db_path=database_path):
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_path
-    print(POSTGRES_PASSWORD)
-    # print('model db print')
+def setup_db(app):
+
+    LOG.debug("database url: %s", config.DATABASE_URL)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = config.DATABASE_URL
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
     db.create_all()
+
+
+class Category(db.Model):
+  __tablename__ = 'category'
+
+  id = Column(Integer, primary_key=True)
+  type = Column(String)
+
+  def __init__(self, type):
+    self.type = type
+
+  def format(self):
+    return {
+      'id': self.id,
+      'type': self.type
+    }

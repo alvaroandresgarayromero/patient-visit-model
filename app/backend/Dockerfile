@@ -8,6 +8,7 @@ COPY . /app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Deployment development: $PORT is set by Heroku
-# Local development: $PORT is set by docker-compose
+# CMD runs in container
+# Deployment development: Heroku reads Dockerfile only, and environment variables are set inside Heroku
+# Local development: Environment variables are set by docker-compose in .env
 CMD gunicorn --bind 0.0.0.0:$PORT "flaskr:create_app()"

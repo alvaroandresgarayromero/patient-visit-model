@@ -1,0 +1,20 @@
+import os
+
+user = os.environ.get('POSTGRES_USER', None)
+password = os.environ.get('POSTGRES_PASSWORD', None)
+host = os.environ.get('POSTGRES_CONTAINER_NAME', None)
+database = os.environ.get('POSTGRES_DB', None)
+port = os.environ.get('POSTGRES_PORT', None)
+
+if host is None:
+    # deployment development with Heroku
+    DATABASE_URL_HEROKU = os.environ.get('DATABASE_URL', None)
+
+    # SQLAlchemy 1.4 removed the deprecated postgres:// dialect name,
+    # the postgresql must be used now. However, Heroku hasn't updated this
+    # on their end. So let's take care of it here.
+    DATABASE_URL = 'postgresql' + DATABASE_URL_HEROKU.replace('postgres', '')
+
+else:
+    # local development with docker-compose container
+    DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{database}'
