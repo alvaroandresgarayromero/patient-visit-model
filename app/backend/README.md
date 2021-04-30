@@ -41,7 +41,9 @@ Docker and Docker-Compose are utilized for local development
     ```bash
     $ docker-composed --version
     ```
-
+  
+  #### Execution
+  
 - Build Docker Image and Run Container
 
     ```bash
@@ -50,8 +52,18 @@ Docker and Docker-Compose are utilized for local development
     # Note that 'docker-compose' handles automatic image and container builds on all code changes except if the DockerFile changes.
     $  docker-compose up
     ```
+  
+    ```bash
+    # To enter Docker Container postgres datatabse
+    $ psql -h localhost -p 5432 -d patientnursedb -U postgres --password
+    ```
+  
+    ```bash
+    # To enter Docker Container Flask app 
+    $ docker exec -it <CONTAINER_NAME> /bin/bash
+    ```
 
-
+  
 #### Deployment Development
 
 Docker and Heroku are utilized for Continuous Integration and Development (CI/CD) 
@@ -74,6 +86,20 @@ Docker and Heroku are utilized for Continuous Integration and Development (CI/CD
     $ heroku create patient-visit-model
     ```
 
+- Create Heroku-Postgres database add-on feature
+  
+    ```bash
+    $ sudo heroku addons:create heroku-postgresql:hobby-dev --app patient-visit-model
+    ```
+- Verify DATABASE_URL exists - the app uses this URL to access the database.
+
+    ```bash
+    # Verify DATABASE_URL exists - the app uses this URL to access the database.
+    $ sudo heroku config --app patient-visit-model
+    ```
+
+  #### Execution
+
 - Option 1: Manually build and deploy the images to Heroku
   
     ```bash
@@ -89,18 +115,12 @@ Docker and Heroku are utilized for Continuous Integration and Development (CI/CD
   
 - Option 2: Automatic Deployment - Heroku handles building the Docker Images
 
-
-
-#### Database is hosted on Heroku
-
-- Create Postgres database 
-  
+  - This is handled with the heroku.yml file (already provided in this workspace). 
+  - Simply, link the git repository to Heroku in order trigger automatic builds.
+       
     ```bash
-    $ sudo heroku addons:create heroku-postgresql:hobby-dev --app patient-visit-model
+    # push a change to the master branch to test the automatic build
+    $ git push
     ```
-- Verify DATABASE_URL exists - the app uses this URL to access the database.
 
-    ```bash
-    # Verify DATABASE_URL exists - the app uses this URL to access the database.
-    $ sudo heroku config --app patient-visit-model
-    ```
+
