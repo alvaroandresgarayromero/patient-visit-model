@@ -123,4 +123,48 @@ Docker and Heroku are utilized for Continuous Integration and Development (CI/CD
     $ git push
     ```
 
+## API Reference:
+
+### Getting Started
+
+#### Base URL
+
+- Local Host:
+  
+    Hosted in a Docker Container as defined by the web service in docker-compose.yml
+  
+    ```bash
+    $ curl http://0.0.0.0:8080/
+    ```
+  
+- Web Host: 
+  
+    Hosted in Heroku using free web dyno. This means that the app will go to sleep if inactive for 30 minutes. Upon incoming traffic, then it will be woken up after a short delay.
+
+    ```bash
+    https://patient-visit-model.herokuapp.com/
+    ```
+  
+#### Authentication
+  
+  @todo
+
+#### Error Handling
+
+  Errors are returned as JSON objects in the following format:
+
+  ```json
+  {
+      "success": false, 
+      "error": 400,
+      "message": "bad request"
+  }
+  ```
+
+  The API will return three error types when requests fail
+
+   - 400: Bad Request
+   - 401: Unauthorized
+   - 404: Resource Not Found
+   - 422: Not Processable
 
