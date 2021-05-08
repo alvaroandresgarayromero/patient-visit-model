@@ -24,117 +24,26 @@ def setup_db(app):
     db.create_all()
 
 
-class Nurse(db.Model):
-    __tablename__ = 'Nurse'
-
-    id = Column(db.Integer, primary_key=True)
-    name = Column(db.String,  nullable=False)
-    visits = db.relationship('Visit', backref='nurses', lazy='joined')
-
-    def __init__(self, name):
-        self.name = name
-
-    def format(self):
-        return {
-            'id': self.id,
-            'name': self.name
-        }
-
-    '''
-     insert()
-         inserts a new model into a database
-         the model must have a unique name
-         the model must have a unique id or null id
-         EXAMPLE
-             nurse = Nurse(name=a_name)
-             nurse.insert()
-     '''
-
-    def insert(self):
-        db.session.add(self)
-        db.session.commit()
-
-    '''
-    delete()
-        deletes a new model into a database
-        the model must exist in the database
-        EXAMPLE
-            nurse = Nurse(name=a_name)
-            nurse.delete()
-    '''
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    '''
-    update()
-        updates a new model into a database
-        the model must exist in the database
-        EXAMPLE
-            nurse = Nurse.query.filter(Nurse.id == id).one_or_none()
-            nurse.name = 'Courtney'
-            nurse.update()
-    '''
-
-    def update(self):
-        db.session.commit()
-
-
-class Patient(db.Model):
-    __tablename__ = 'Patient'
-
-    id = Column(db.Integer, primary_key=True)
-    name = Column(db.String, nullable=False)
-    gender = Column(db.String,  nullable=False)
-    age = Column(db.Integer,  nullable=False)
-    visits = db.relationship('Visit', backref='patients', lazy='joined')
-
-    def __init__(self, name, gender, age):
-        self.name = name
-        self.gender = gender
-        self.age = age
-
-    def format(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'gender': self.gender,
-            'age': self.age
-        }
-
-    def insert(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-
 class Visit(db.Model):
     __tablename__ = 'Visit'
 
     id = Column(db.Integer, primary_key=True)
-    nurse_id = db.Column(db.Integer, db.ForeignKey('Nurse.id'), nullable=False)
-    patient_id = db.Column(db.Integer, db.ForeignKey('Patient.id'), nullable=False)
+    nurse_auth0_id = Column(db.String, nullable=False)
+    patient_auth0_id = Column(db.String, nullable=False)
     visit_time = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, nurse_id, patient_id, visit_time):
-        self.nurse_id = nurse_id
-        self.patient_id = patient_id
+    def __init__(self, nurse_auth0_id, patient_auth0_id, visit_time):
+        self.nurse_auth0_id = nurse_auth0_id
+        self.patient_auth0_id = patient_auth0_id
         self.visit_time = visit_time
 
     def format(self):
         return {
             'id': self.id,
-            'nurse_id': self.nurse_id,
-            'nurse_name': self.Nurse.name,
-            'patient_id': self.patient_id,
-            'patient_name': self.Patient.name,
+            'nurse_auth0_id': self.nurse_auth0_id,
+            'nurse_name': 'na',
+            'patient_auth0_id': self.patient_auth0_id,
+            'patient_name': 'na',
             'visit_time': self.visit_time
         }
 

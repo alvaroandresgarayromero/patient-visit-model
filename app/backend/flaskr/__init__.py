@@ -8,7 +8,7 @@ def create_app():
     app = Flask(__name__)
     setup_db(app)
 
-    @app.route('/', methods=['GET'])
+    @app.route('/verify_server_is_running', methods=['GET'])
     def index():
         # quick verification response to verify
         # that the server is active
@@ -21,10 +21,87 @@ def create_app():
         try:
             nurse = Nurse(name=body.get('name'))
             nurse.insert()
+            output = nurse.format()
         except:
             abort(422)
 
-        return jsonify(nurse.format())
+        return jsonify(output)
+
+    @app.route('/patients/create', methods=['POST'])
+    def create_patient():
+        body = request.get_json()
+
+        try:
+            patient = Patient(name=body.get('name'),
+                              gender=body.get('gender'),
+                              age=body.get('age'))
+            patient.insert()
+            output = patient.format()
+
+        except:
+            abort(422)
+
+        return jsonify(output)
+
+    @app.route('/nurses/<int:a_id>', methods=['GET'])
+    def get_nurse(a_id):
+        try:
+            nurse = Nurse.query.get(a_id)
+            output = nurse.format()
+
+        except:
+            abort(404)
+
+        return jsonify(output)
+
+    @app.route('/patients/<int:a_id>', methods=['GET'])
+    def get_patient(a_id):
+        try:
+            patient = Patient.query.get(a_id)
+            output = patient.format()
+        except:
+            abort(404)
+
+        return jsonify(output)
+
+    @app.route('/nurses/<int:a_id>', methods=['PATCH'])
+    def update_nurse(a_id):
+
+        body = request.get_json()
+
+        try:
+            nurse = Nurse.query.get(a_id)
+
+            nurse.name = body.get('name')
+
+            nurse.update()
+
+            output = nurse.format()
+
+        except:
+            abort(404)
+
+        return jsonify(output)
+
+    @app.route('/patients/<int:a_id>', methods=['PATCH'])
+    def update_patient(a_id):
+
+        body = request.get_json()
+
+        try:
+            patient = Patient.query.get(a_id)
+
+            patient.name = body.get('name')
+            patient.gender = body.get('gender')
+            patient.age = body.get('age')
+
+            patient.update()
+
+            output = patient.format()
+        except:
+            abort(404)
+
+        return jsonify(output)
 
     @app.errorhandler(400)
     def bad_request(error):
