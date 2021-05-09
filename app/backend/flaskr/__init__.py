@@ -14,35 +14,22 @@ def create_app():
         # that the server is active
         return jsonify({'success': True})
 
-    @app.route('/nurses/create', methods=['POST'])
-    def create_nurse():
+    @app.route('/visits/create', methods=['POST'])
+    def create_visit():
         body = request.get_json()
 
         try:
-            nurse = Nurse(name=body.get('name'))
-            nurse.insert()
-            output = nurse.format()
+            visit = Visit(nurse_auth0_id=body.get('nurse_auth0_id'),
+                          patient_auth0_id=body.get('nurse_auth0_id'),
+                          visit_time=body.get('visit_time'))
+            visit.insert()
+            output = visit.format()
         except:
             abort(422)
 
         return jsonify(output)
 
-    @app.route('/patients/create', methods=['POST'])
-    def create_patient():
-        body = request.get_json()
-
-        try:
-            patient = Patient(name=body.get('name'),
-                              gender=body.get('gender'),
-                              age=body.get('age'))
-            patient.insert()
-            output = patient.format()
-
-        except:
-            abort(422)
-
-        return jsonify(output)
-
+    '''
     @app.route('/nurses/<int:a_id>', methods=['GET'])
     def get_nurse(a_id):
         try:
@@ -101,7 +88,8 @@ def create_app():
         except:
             abort(404)
 
-        return jsonify(output)
+        return jsonify(output) 
+    '''
 
     @app.errorhandler(400)
     def bad_request(error):
