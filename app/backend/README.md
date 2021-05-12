@@ -214,7 +214,7 @@ Currently, Docker-Compose is been used to create two containers: a web container
     AUTH0 provides many methods on how to perform user login and how to get the user JWT. For web deployment development, this application uses the 'Login: Social' AUTH0 API. 
     This AUTH0 API is a secure method that allows the backend to not maintain user credentials (username and password) to login. 
     This type of authentication is known as a social connection which is browser-based authentication only. 
-    Therefore, the user is redirected to the AUTH0 LOGIN URL PAGE to login, and then a call-back URL provides the user JWT token.
+    In this case, the user were registered in AUTH0. Therefore, users are redirected to the AUTH0 LOGIN URL PAGE to login, and then a call-back URL provides the user JWT token.
     This method adds some overhead to the backend, but enables no dependencies with user credentials. 
   
     ```bash
