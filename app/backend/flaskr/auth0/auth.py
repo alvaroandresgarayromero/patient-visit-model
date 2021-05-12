@@ -1,14 +1,15 @@
 import json
+import os
 from flask import request, _request_ctx_stack
 from functools import wraps
 from jose import jwt
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 
 
-AUTH0_DOMAIN = 'dev-amj9exua.us.auth0.com'
-
+AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN', None)
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'dev'
+API_AUDIENCE = os.environ.get('AUTH0_AUDIENCE', None)
+
 
 ## AuthError Exception
 '''
@@ -160,6 +161,28 @@ def verify_decode_jwt(token):
                 'description': 'Unable to find the appropriate key.'
             }, 400)
 
+'''
+Gets active user information such as nickname, name, picture, email
+based on the 'Get User Info' AUTH0 API
+
+INPUT: None
+OUTPUT: [dictionary] json data
+
+NOTES:
+    GET https://YOUR_DOMAIN/userinfo
+    Authorization: 'Bearer {ACCESS_TOKEN}'
+'''
+def get_active_user_info():
+    url = 'https://{}/userinfo'.format(AUTH0_DOMAIN)
+
+    token = get_token_auth_header()
+    bearer_token = 'Bearer {}'.format(token)
+
+    req = Request(url, headers={'Authorization': bearer_token})
+    respond = urlopen(req)
+    data = respond.read()
+
+    return json.loads(data)
 
 '''
 @TODO implement @requires_auth(permission) decorator method

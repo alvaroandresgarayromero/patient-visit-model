@@ -6,6 +6,8 @@ services:
     container_name: web_container_latest
     env_file:
       - .env
+      - flaskr/auth0/auth0.env
+      - flaskr/db/db.env
     ports:
       -  ${PORT}:${PORT}
     volumes:

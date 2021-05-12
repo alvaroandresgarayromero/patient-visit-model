@@ -1,33 +1,45 @@
-import os
 from flask import Flask, jsonify, request, abort
-from .models import *
-from .auth import *
+from .db.models import *
+from .auth0 import auth
+from .logprint import _logger
+
+LOG = _logger('flaskr.__init__')
 
 
 def create_app():
+
     app = Flask(__name__)
     setup_db(app)
 
-    @app.route('/verify_server_is_running', methods=['GET'])
+    @app.route('/', methods=['GET'])
+    @app.route('/login-results', methods=['GET'])
     def index():
         # quick verification response to verify
         # that the server is active
         return jsonify({'success': True})
 
     @app.route('/visits/create', methods=['POST'])
-    def create_visit():
+    @auth.requires_auth(permission='post:visits')
+    def create_visit(payload):
         body = request.get_json()
 
+        LOG.debug("entered create_visit() endpoint {}", payload)
+
+        '''
         try:
             visit = Visit(nurse_auth0_id=body.get('nurse_auth0_id'),
                           patient_auth0_id=body.get('nurse_auth0_id'),
                           visit_time=body.get('visit_time'))
             visit.insert()
             output = visit.format()
+            
         except:
             abort(422)
+        '''
 
-        return jsonify(output)
+        #return jsonify(output)
+
+        return auth.get_active_user_info()
 
     '''
     @app.route('/nurses/<int:a_id>', methods=['GET'])
@@ -122,6 +134,12 @@ def create_app():
             "error": 422,
             "message": "Unprocessable"
         }), 422
+
+    @app.errorhandler(auth.AuthError)
+    def handle_auth_error(ex):
+        response = jsonify(ex.error)
+        response.status_code = ex.status_code
+        return response
 
     return app
 

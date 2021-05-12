@@ -8,7 +8,7 @@ Setup logger format, level, and handler.
 
 RETURNS: log object
 '''
-def _logger():
+def _logger(__name__):
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     log = logging.getLogger(__name__)

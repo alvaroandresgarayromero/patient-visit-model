@@ -10,6 +10,10 @@ if host is None:
     # deployment development with Heroku
     DATABASE_URL_HEROKU = os.environ.get('DATABASE_URL', None)
 
+    assert DATABASE_URL_HEROKU is not None, 'DATABASE was not found during initialization routine. ' \
+                                            'NOTE that local development such as tests need to be ran ' \
+                                            'from a Docker Container. See Local Development README for more info'
+
     # SQLAlchemy 1.4 removed the deprecated postgres:// dialect name,
     # the postgresql must be used now. However, Heroku hasn't updated this
     # on their end. So let's take care of it here.

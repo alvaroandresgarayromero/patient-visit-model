@@ -1,9 +1,10 @@
-from sqlalchemy import Column, String, Integer, create_engine
+from sqlalchemy import Column
 from flask_sqlalchemy import SQLAlchemy
 from . import config
-from .logprint import _logger
+from ..logprint import _logger
 
-LOG = _logger()
+
+LOG = _logger(__name__)
 
 db = SQLAlchemy()
 

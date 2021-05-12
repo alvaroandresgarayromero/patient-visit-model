@@ -6,7 +6,7 @@ As part of the Full-Stack Udacity Nanodegree Capstone final project, the scope o
 
 By completing this project, the student will have had the opportunity to implement all concepts learned throughout the program, which include architecting relational database models in Python, utilizing SQLAlchemy to conduct database queries, following RESTful principles of API development, structuring endpoints to respond to HTTP methods, including error handling, enabling role based authentication and roles-based access control with Autho0 (third-party authentication software as a service API), hosting the application live via Heroku, executing unit test, creating requirements, and documentation of a web API.
 
-## Getting Started
+## Getting Started:
 
 ### Development Environment
 
@@ -14,7 +14,7 @@ By completing this project, the student will have had the opportunity to impleme
 
 GitHub is used to maintain all required files
 
-- Verify git is installed by checking the version. If not, install git.
+- Verify git is installed by checking the version. If not, install the latest git.
 
     ```bash
     $ git --version
@@ -25,147 +25,369 @@ GitHub is used to maintain all required files
     ```bash
     $ git clone https://github.com/alvaroandresgarayromero/patient-visit-model.git
     ```
-
 #### Local Development
 
-Docker and Docker-Compose are utilized for local development
- 
-- Verify Docker is installed by checking the version. If not, install Docker
-
-    ```bash
-    $ docker --version
-    ```
+- Docker: Docker and Docker-Compose are utilized to create a containerized service for local development, and testing.
+Currently, Docker-Compose is been used to create two containers: a web containerized service, and database containerized service.
+  Furthermore, Docker-Compose also maintains the environment variables for each container. 
   
-- Verify Docker-Composed is installed by checking the version. If not, install Docker-Composed
-
-    ```bash
-    $ docker-composed --version
-    ```
+  ```bash
+  NOTE: Append 'sudo' before any docker command. If you want to run docker as non-root user then you need to add your user to the docker group. 
+  ```  
   
-  #### Execution
+  - Verify Docker is installed by checking the version. If not, install the latest Docker
   
-- Build Docker Image and Run Container
-
-    ```bash
-    # If the expected image does not exist then docker-compose will build a new image from DockerFile
-    # Any future changes on the DockerFile will need to be manually build ($ docker-compose build) prior to executing the command below
-    # Note that 'docker-compose' handles automatic image and container builds on all code changes except if the DockerFile changes.
-    $  docker-compose up
-    ```
+      ```bash
+      # this project used Docker version 20.10.5
+      $ docker --version
+      ```
+    
+  - Verify Docker-Composed is installed by checking the version. If not, install the latest Docker-Composed
   
-    ```bash
-    # To enter Docker Container Postgres database
-    $ psql -h localhost -p 5432 -d patientnursedb -U postgres --password
-      Password: 
+      ```bash
+      # this project used docker-compose version 1.29.1
+      $ docker-compose --version
+      ```
+    
+  - Execution: Build Docker Image and Run Container
   
-    # Where the password will be requested. This is defined in the .evn file
-    ```
+      ```bash
+      # If the expected image does not exist then docker-compose will build a new image from DockerFile
+      # Any future changes on the DockerFile will need to be manually build ($ docker-compose build) prior to executing the command below
+      # Note that 'docker-compose' can detect the workspace code is modified. Therefore, the new images and container are build with the new changes
+      $  docker-compose up
+      ```
+    
+      ```bash
+      # To enter Docker Web Container Flask app 
+      $ docker exec -it <CONTAINER_ID or CONTAINER_NAME> /bin/bash
+    
+      # To get CONTAINER_ID or 
+      # use the CONTAINER_NAME currently 
+      # set to 'web_container_latest'
+      $ docker ps 
+      ```
   
-    ```bash
-    # To enter Docker Container Flask app 
-    $ docker exec -it <CONTAINER_NAME> /bin/bash
-    ```
+      ```bash
+      # To enter Docker Database Container 
+      $ psql -h localhost -p 5432 -d patientnursedb -U postgres --password
+        Password: 
+    
+      # Where the password is defined in the flaskr/db/db.evn file
+      ```
   
-  #### Verify Server Is Running (Quick Test)
-
+    
+  - Verify Server Is Running (Quick Test)
+    
     Input: 
-  
-    ```bash
-    curl http://0.0.0.0:8080/verify_server_is_running
-    ```
-  
+    
+      ```bash
+      curl http://0.0.0.0:8080/
+      ```
+    
     Output: 
+    
+      ```json
+      {
+          "success": true
+      }
+      ```
   
-    ```json
-    {
-        "success": true
-    }
+  - AUTH0
+
+    The Patient-Visit-Model application interfaces with AUTH0 to manage security concerns revolving users (registration and login), roles and permission. 
+    This is accomplished with JWT user tokens that are generated by AUTH0, and consumed by the backend. Therefore, the backend requires the user JWT token in order to successfully interface with its endpoints.
+    
+    AUTH0 provides many methods on how to perform user login and how to get the user JWT. For local development, this application uses the 'Resource Owner Password' AUTH0 API. 
+    This AUTH0 API allows the backend to directly use the users credentials (username and password) to login, and 
+    respond with the JWT token in a jsonify format. 
+    This method enables the backend to have no dependencies with the frontend when running automated test.
+    
+    ```bash
+    # AUTHO Authentication API -> Get Token -> Resource Owner Password
+    POST /oauth/token
     ```
-
-#### Deployment Development
-
-Heroku is utilized for Continuous Integration and Development (CI/CD). 
-Heroku provides functionality to work with Docker. So, this project takes advantage of this feature.
-
-- Verify Heroku is installed by checking the version. If not, install Heroku CLI
+    The users have already been created in AUTH0 and their credentials (username and password) are maintained in environment variables, which are located in the file shown below. 
+    Note, that these users are used for local development, and automated testing purposes. In the web deployment section, we will use a more secure method to login and get the JWT token.
 
     ```bash
-    $ heroku --version
-    ```
-  
-- Create a Heroku account, and then log in to Container Registry
-
-    ```bash
-    $ heroku container:login
-    ```
-
-- Navigate to the app's directory, and create a Heroku app
-
-    ```bash
-    $ heroku create patient-visit-model
-    ```
-
-- Create Heroku-Postgres database add-on feature
-  
-    ```bash
-    $ sudo heroku addons:create heroku-postgresql:hobby-dev --app patient-visit-model
-    ```
-- Verify DATABASE_URL exists - the app uses this URL to access the database.
-
-    ```bash
-    # Verify DATABASE_URL exists - the app uses this URL to access the database.
-    $ sudo heroku config --app patient-visit-model
-    ```
-  
-    ```bash
-    # As of 04/01/2021, the DATABASE_URL can be access in the CLI as
-    $ psql -h ec2-52-87-107-83.compute-1.amazonaws.com -p 5432 -d dcaa3dle9k21qs -U ljqndisewszxtw --password
-      Password: 
-  
-      # Where the user password will be requested. This is defined in the DATABASE_URL
-    ```
-  
-  #### Execution
-
-- Step 1: Configure our Heroku application to use Docker by manually building and deploying the image to Heroku.
-  
-    ```bash
-    # builds docker container on heroku container registry
-    $ heroku container:push web --app patient-visit-model
-  
-    # release the image to the app
-    $ heroku container:release web --app patient-visit-model
-  
-    # opens web application on browser
-    $ heroku open --app patient-visit-model
-    ```
-  
-- Step 2: Automatic Deployment - Heroku handles building the Docker Images
-
-  - This is enabled with the heroku.yml file (already provided in this workspace). 
-  - In Heroku, link your git repository in order to trigger automatic builds.
-       
-    ```bash
-    # push a change to the master branch to test the automatic build.
-    # For example, modify the "/verify_server_is_running" endpoint json response
-    $ git push
+    flarkr/auth0/auth0.env
     ```
     
-  #### Verify Server Is Running (Quick Test)
+    For more information, about the AUTH0 configurations been used, see the 'API Reference' section.
+ 
+#### Web Deployment Development
 
-    Input (web browser): 
+- Heroku: Heroku is utilized for Continuous Integration and Development (CI/CD) and Deployment.
+  However, at this moment, automatic test regression has not been enabled in Heroku (because there is a cost to enable this feature). 
+  Currently, Heroku is been used to create automatic builds when a push is done on git, 
+  build Docker images inside Heroku, maintain the database in Heroku, and maintain the environment variables in Heroku. 
+    
+  - Verify Heroku is installed by checking the version. If not, install Heroku CLI
+  
+      ```bash
+      $ heroku --version
+      ```
+    
+  - Create a Heroku account, and then log in to Container Registry
+  
+      ```bash
+      $ heroku container:login
+      ```
+  
+  - Navigate to the app's directory, and create a Heroku app
+  
+      ```bash
+      $ heroku create patient-visit-model
+      ```
+  
+  - Create Heroku-Postgres database add-on feature
+    
+      ```bash
+      # DATABASE_URL environment variable should automatically be created in Heroku 
+      $ sudo heroku addons:create heroku-postgresql:hobby-dev --app patient-visit-model
+      ```
+  - Verify DATABASE_URL environment variable exists - the app uses this URL to access the database.
+  
+      ```bash
+      # Verify DATABASE_URL exists - the app uses this URL to access the database.
+      $ sudo heroku config --app patient-visit-model
+      ```
+    
+      ```bash
+      # As of 04/01/2021, the DATABASE_URL can be access in the CLI as
+      $ psql -h ec2-52-87-107-83.compute-1.amazonaws.com -p 5432 -d dcaa3dle9k21qs -U ljqndisewszxtw --password
+        Password: 
+    
+      # Where the user password will be requested. This is defined in the DATABASE_URL:
+      # db_engine://user:password@host:port/database_name'
+        
+      ```
+    
+  - Deployment
+  
+    - Step 1: Configure our Heroku application to use Docker by manually building and deploying the image to Heroku.
+      
+        ```bash
+        # builds docker container on heroku container registry
+        $ heroku container:push web --app patient-visit-model
+      
+        # release the image to the app
+        $ heroku container:release web --app patient-visit-model
+      
+        # opens web application on browser
+        $ heroku open --app patient-visit-model
+        ```
+      
+    - Step 2: Automatic Deployment - Heroku handles building the Docker Images
+    
+      - This is enabled with the heroku.yml file (already provided in this workspace). 
+      - In Heroku, link the git repository in order to trigger automatic builds.
+           
+        ```bash
+        # push a change to the master branch to test the automatic build.
+        # For example, modify the "/verify_server_is_running" endpoint json response
+        $ git push
+        ```
+      
+- Verify Server Is Running (Quick Test)
+
+  Input (web browser): 
   
     ```bash
-    https://patient-visit-model.herokuapp.com/verify_server_is_running
+    https://patient-visit-model.herokuapp.com/
     ```
   
-    Output: 
+  Output: 
   
     ```json
     {
         "success": true
     }
     ```
+  
+- AUTH0
+
+    The Patient-Visit-Model application interfaces with AUTH0 to manage security concerns revolving users (registration and login), roles and permission. 
+    This is accomplished with JWT user tokens that are generated by AUTH0, and consumed by the backend. Therefore, the backend requires the user JWT token in order to successfully interface with its endpoints. 
+    
+    AUTH0 provides many methods on how to perform user login and how to get the user JWT. For web deployment development, this application uses the 'Login: Social' AUTH0 API. 
+    This AUTH0 API is a secure method that allows the backend to not maintain user credentials (username and password) to login. 
+    This type of authentication is known as a social connection which is browser-based authentication only. 
+    Therefore, the user is redirected to the AUTH0 LOGIN URL PAGE to login, and then a call-back URL provides the user JWT token.
+    This method adds some overhead to the backend, but enables no dependencies with user credentials. 
+  
+    ```bash
+    # AUTHO Authentication API -> Login -> Social
+    GET /authorize
+    ```
+  - AUTH0 LOGIN PAGE:
+    - Step 1: The following script will generate the required URL to access the '/authorize' AUTH0 API endpoint in order to LOGIN a user into AUTH0 LOGIN PAGE
+      
+      ```bash
+      $ source flaskr/auth0/run_setup.sh 
+      ```
+      
+    - Step 2: Copy the URL, and paste it into your desired web-browser.
+      
+  - GET NEW USER JWT TOKEN:
+    - Step 1: Go to the AUTH0 LOGIN PAGE 
+    - Step 2: Login with one of the 'Registered AUTH0 User' credentials, which can be found in the file below.
+  
+      ```bash
+      flarkr/auth0/auth0.env
+      ```
+      
+    - Step 3: Upon successful login, AUTH0 will generate a callback URL that has an access_token variable with the JWT token data.
+    
+  - About SETUP.SH:
+    
+    This bash file is for Udacity reviewers as part of the grading requirement. 
+    It holds the AUTH0 configurations used by the application running on Heroku, as well as some valid user JWT tokens that 
+    were generated right before submitting the project for grading. 
+    
+    For more information, about the AUTH0 configurations been used, see the 'API Reference' section.
+
+
+#### AUTHORIZATION (AUTH0)
+
+The backend utilizes AUTH0 for application authorization, user permissions, and user information.
+
+AUTH0 is a third party platform that securely manages users, and their private information. 
+Thus, allowing us not to worry about managing the security concerns when it comes to keeping users data safe. 
+AUTH0 generated JSON-WEB-TOKEN (JWT) and AUTH0 API enables external applications (us) to interface with them, and utilize these security features.
+ 
+In a regular web application, the frontend (not supported) would provide support for a user to register into the AUTH0 app, and then login into the AUTH0 LOGIN page.
+Upon successful user login, a JSON WEB TOKEN (JWT) is generated by AUTH0, and passed to the front-end. 
+When the logged-in user triggers a backend endpoint, then the user's JWT gets decrypted, and then verified with the AUTH0 API to determined if the JWT is healthy, and has not been manipulated/tinkered. 
+Upon successful authorization, then the payload data in the JWT is utilized to check whether the user has permission to access the requested end-point. 
+In addition, the backend uses the JWT to request the AUTH0 API for more information about the user. 
+
+Currently, two AUTH0 applications have been configured. In addition, four users have been pre-registered since this application doesn't support the frontend. 
+- AUTH0 APP 1: It is a Test Application (machine to machine AUTH0 APP) which is used for local development.
+- AUTH0 APP 2: The second is a released application (regular web application AUTH0 APP) which is used for deployment in Heroku.
+
+Both AUTH0 applications are identical in configurations. The main difference between them is the host address: Local host vs web host. 
+To see the AUTH0 configuration and host address, see the 'API Reference' section for detail information.
+
+#### AUTH0 and Local Development
+ 
+
+#### AUTH0 and Deployment with Heroku
+
+
+
+#### Generate new AUTH0 JWT token:
+
+  - Step 1: The following script will generate the required URL to access the '/authorize' AUTH0 API endpoint in order to LOGIN a user into AUTH0 LOGIN PAGE
+    
+    ```bash
+    $ source flaskr/auth0/run_setup.sh 
+    ```
+    
+  - Step 2: Copy the URL, and paste it into your desired web-browser. 
+  - Step 3: Login with one of the 'Registered AUTH0 User' credentials. 
+    Upon successful login, AUTH0 will generate a callback URL that has an access_token variable with the JWT token data.
+
+#### Update JWT Environment Variables: 
+
+This application maintains the JWT token of each user manually in environment variables for test purposes.  
+
+NOTE: the JWT expire after a period of time. Therefore, the developer must ensure to generate a new JWT for the tests to pass. 
+
+  - Step 1: In your local computer, go to the project workspace, and open the auth0.env file 
+
+     ```bash 
+     # flaskr/auth0/auth0.env
+     ```
+
+  - Step 3: Update the user environment variable with the new token
+    
+     ```bash 
+     ADMIN_USER=<JWT TOKEN>
+     NURSE_USER=<JWT TOKEN>
+     PATIENT_USER_1=<JWT TOKEN>
+     PATIENT_USER_2=<JWT TOKEN>
+     ```
+
+  - Step 4: Verify that no docker container is running. Run 'docker-compose up' to update and run the docker container with the new environment variables
+
+    ```bash
+    # your local computer
+    $ docker-compose up
+    ```
+
+  - Step 4: Docker-compose will automatically add the environment variables
+    
+  - Step 5: (optional) Verify the environment variable have been updated by inspecting the docker container manually
+
+    ```bash
+    # inside docker container 
+    $ echo $<ENVIRONMENT_VARIABLE_NAME>
+    ```
+
+
+### Tests
+
+Tests are defined in the requirement section. 
+
+## BackEnd Requirements:
+
+Requirements are organized in three sections where the keyword "context" on requirement IDs are descriptions.
+
+- Software Requirement Design (SRD) - Provides high level user-facing design requirements where all SRDs are reusable and portable into any other framework.
+- Software Requirement Specification (SRS) - Provides high level system/technical requirements that satisfy SRDs, and are testable where most, but not all SRSs are reusable and portable into any other framework.
+- Software Test Procedure (STP) - Provides test procedures requirements that satisfies SRSs, and contain quantifiable metrics that result on the test to PASS or FAIL.  
+
+### SRD
+
+### SRS
+
+### STP
+
+- STP_0 - Context
+
+  A test must complete the test suite with no errors in order to be considered a PASS. 
+  A test suite that does not complete the entirety of the test is considered a FAILURE.
+  
+    - Step 1: Determine if the JWT token need to be updated. These are maintained in environment variables. (see Getting Started -> Authorization )
+      - b) Log into each registered user to get new JWT tokens 
+      - a) Update the user JWT environment variables
+        
+        ```bash
+        flaskr/auth0/auth0.env
+        ```
+
+    - Step 2: Go to app/backend/ and then create and run the docker container. 
+  
+      ```bash
+      $ docker-compose up
+      ```
+      
+    - Step 3: Enter the web docker container
+      
+      ```bash
+      $ docker exec -it web_container_latest /bin/bash
+      ```
+         
+    - Step 4: Run the tests inside the docker container 
+      
+        - To run individual tests, follow the ‘STP-XX Requirement’ instructions
+      
+        ```bash
+        $ python3 -m unittest test_flaskr.PatientVisitTestCase.<STP_XX>
+        ```  
+      
+        - Otherwise, to execute all tests run:
+      
+        ```bash
+        $ python3 test_flaskr.py
+        ```
+      
+- STP_01 - Requirement
+
+
+
 
 ## API Reference:
 
@@ -189,19 +411,7 @@ Heroku provides functionality to work with Docker. So, this project takes advant
     https://patient-visit-model.herokuapp.com/
     ```
   
-#### Authentication (AUTH0)
-  
-The backend utilizes AUTH0 for application authorization, user permissions, and user information.
-
-AUTH0 is a third party platform that securely manages users, and their private information. 
-Thus, allowing us not to worry about managing the security concerns when it comes to keeping users data safe. AUTH0 generated JSON-WEB-TOKEN (JWT) and AUTH0 API enables external applications (us) to interface with them, and utilize these security features.
-
-A JWT is generated upon successful user login by AUTH0. Normally, the frontend (not supported) would provide support to login into AUTH0 LOGIN page.
-Upon successful login, the generated JWT is passed to the backend endpoint where it gets decrypted, and then verified with the AUTH0 API to determined if the JWT is healthy, and has not been manipulated/tinkered. 
-Upon successful authorization, then the payload data in the JWT is utilized to check whether the user has permission to access the requested end-point. 
-In addition, the backend uses the JWT to request the AUTH0 API for more information about the user. 
-
-AUTH0 Configurations:
+#### AUTH0 Configurations 
 
 - Application:
   - Name: PatientVisitModel
@@ -230,41 +440,6 @@ AUTH0 Configurations:
   - Nurse: 
   - Patient:
   
-- Active Users:
-  - ADMIN_USER:
-    - email: admin@nursevisitmodel.com
-    - password: Alvaro123
-    
-  - NURSE_USER:
-    - email: nurse@nursevisitmodel.com
-    - password: Alvaro123    
-    
-  - PATIENT_USER_1:
-    - email: patient_nursepatientmodel_1@gmail.com
-    - password: Alvaro123
-    
-  - PATIENT_USER_2:
-    - email: patient_nursepatientmodel_2@gmail.com
-    - password: Alvaro123
-
-Generate and Update JWT token environment variables: 
-
-  - Step 1: The following script will generate the required URL to access the '/authorize' AUTH0 API endpoint in order to create a user JWT token
-    
-    ```bash
-    $ source auth0/auth0_auth_login.sh 
-    ```
-    
-  - Step 2: Copy the URL, and paste it into your desired web-browser. The AUTH0 LOGIN page will load.
-  - Step 3: Login with one of the 'Active User' credentials. Upon successful login, AUTH0 will generate a new URL with the JWT token code. 
-  - Step 4: Copy the JWT token code into the respective auth0/setup.sh 'token' environment variable
-      - $ADMIN_USER | $NURSE_USER | $PATIENT_USER_1 | $PATIENT_USER_2
-  
-  - Step 5: Set the new environment variable(s)
-    
-    ```bash
-    $ source auth0/setup.sh 
-    ```
 
 #### Error Handling
 
