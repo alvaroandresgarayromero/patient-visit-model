@@ -105,7 +105,7 @@ Currently, Docker-Compose is been used to create two containers: a web container
     
     ```bash
     # AUTHO Authentication API -> Get Token -> Resource Owner Password
-    POST /oauth/token
+    https://{AUTH0_DOMAIN}/oauth/token
     ```
     The users have already been created in AUTH0 and their credentials (username and password) are maintained in environment variables, which are located in the file shown below. 
     Note, that these users are used for local development, and automated testing purposes. In the web deployment section, we will use a more secure method to login and get the JWT token.
@@ -219,7 +219,7 @@ Currently, Docker-Compose is been used to create two containers: a web container
   
     ```bash
     # AUTHO Authentication API -> Login -> Social
-    GET /authorize
+    https://{AUTH0_DOMAIN}//authorize
     ```
   - AUTH0 LOGIN PAGE:
     - Step 1: The following script will generate the required URL to access the '/authorize' AUTH0 API endpoint in order to LOGIN a user into AUTH0 LOGIN PAGE
@@ -365,7 +365,16 @@ The main difference between them is the host address: Local host vs web host, an
   - Application Login URI: https://<docker_backend_domain>/login
   - Allowed Callback URLs (required to get JWT from URL): https://<docker_backend_domain>/login-results
   - Allowed Logout URLs: https://<docker_backend_domain>/logout 
-  
+  - To interface successfully with https://{AUTH0_DOMAIN}/oauth/token, the following settings must be configured:
+    - Client Application settings: 
+      ```bash
+      Applications -> Settings -> Advanced Settings -> Grant Types : Password
+      ```
+    - Tenant Settings: (Under tenant user account -> settings) 
+      ```bash
+      Set General -> API Authorization Settings ->Default Directory : Username-Password-Authentication
+      ```
+ 
 - Web Deployment Development AUTH0 Application: See flaskr/autho0/setup.sh for environment variables
   - Name: PatientVisitModel
   - Domain: $AUTH0_DOMAIN
