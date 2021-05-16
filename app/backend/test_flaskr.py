@@ -1,10 +1,9 @@
 import unittest
+import os
+import requests
+from flaskr.auth0.authManagementAPI import *
 from flaskr import create_app
 
-from urllib.request import urlopen, Request
-from urllib import parse
-import os
-import json
 
 AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN', None)
 AUTH0_AUDIENCE = os.environ.get('AUTH0_AUDIENCE', None)
@@ -12,40 +11,44 @@ AUTH0_SCOPE = os.environ.get('AUTH0_SCOPE', None)
 AUTH0_CLIENT_ID = os.environ.get('AUTH0_CLIENT_ID', None)
 AUTH0_CLIENT_SECRET = os.environ.get('AUTH0_CLIENT_SECRET', None)
 
-def get_user_token():
-    url = 'https://{}/oauth/token'.format(AUTH0_DOMAIN)
+AUTH0_MANAGEMENT_AUDIENCE = os.environ.get('AUTH0_MANAGEMENT_AUDIENCE', None)
+AUTH0_MANAGEMENT_CLIENT_ID = os.environ.get('AUTH0_MANAGEMENT_CLIENT_ID', None)
+AUTH0_MANAGEMENT_CLIENT_SECRET = os.environ.get('AUTH0_MANAGEMENT_CLIENT_SECRET', None)
 
-    data2 = {'grant_type': 'password',
-            'username=': 'admin@nursevisitmodel.com',
-            'password': 'Alvaro123',
-            'audience': AUTH0_AUDIENCE,
-            'scope': AUTH0_SCOPE,
-            'client_id': AUTH0_CLIENT_ID,
-            'client_secret': AUTH0_CLIENT_SECRET}
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', None)
+USERS_PASSWORD = os.environ.get('USERS_PASSWORD', None)
 
-
-    header = 'content-type: application/x-www-form-urlencoded'
-    data = f'grant_type=password&username=admin@nursevisitmodel.com&password=Alvaro123&audience={AUTH0_AUDIENCE}&scope={AUTH0_SCOPE}&client_id={AUTH0_CLIENT_ID}&client_secret={AUTH0_CLIENT_SECRET}'
-
-
-    datacurl = f'curl --request POST --url {url} --header {header} --data {data}'
-
-
-    datacurl = 'curl --request POST --url \'{}\' --header \'{}\' --data \'{}\' '.format( url, header, data)
-
-    print(datacurl)
-
-   # data_parse = parse.urlencode(data2).encode()
-
-  #  req = Request(url,
-  #                headers={'content-type': 'application/x-www-form-urlencoded'},
-   #               data=data_parse)
+'''
+INPUT: 
+    a_username [string]: email of AUTH0 user
+    a_password [string]: password of AUTH0 user
+    
+OUTPUT:
+    respond [dict] : token information in dictionary format 
+                     where 'access_token' key is the JWT token.
+'''
 
 
- #   respond = urlopen(req)
-  #  data = respond.read()
+def get_user_token(a_username, a_password):
+    url = f'https://{AUTH0_DOMAIN}/oauth/token'
 
-    return True
+    header = {'content-type': 'application/x-www-form-urlencoded'}
+
+    payload = {'grant_type': 'password',
+               'username': a_username,
+               'password': a_password,
+               'audience': AUTH0_AUDIENCE,
+               'scope': AUTH0_SCOPE,
+               'client_id': AUTH0_CLIENT_ID,
+               'client_secret': AUTH0_CLIENT_SECRET}
+
+    respond = requests.post(url,
+                            headers=header,
+                            data=payload)
+    oauth = respond.json()
+    access_token = oauth.get('access_token')
+
+    return access_token
 
 
 class PatientVisitTestCase(unittest.TestCase):
@@ -64,10 +67,6 @@ class PatientVisitTestCase(unittest.TestCase):
         query = '/'
         server_response = self.client().get(query)
         data = server_response.get_json()
-
-        tempdata = get_user_token()
-
-        print(tempdata)
 
         self.assertEqual(data['success'], True)
 

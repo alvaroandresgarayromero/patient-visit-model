@@ -11,7 +11,7 @@ concepts learned throughout the program, which include architecting relational d
 models in Python, utilizing SQLAlchemy to conduct database queries, 
 following RESTful principles of API development, structuring endpoints to respond to HTTP methods, 
 including error handling, enabling role based authentication and roles-based access control 
-with Autho0 (third-party authentication software as a service API), hosting the application live via Heroku,
+with Autho0 (third-party authentication software as a service API), running Docker Containers, hosting the application live via Heroku,
 executing unit test, creating requirements, and documentation of a web API.
 
 ## About the Stack 

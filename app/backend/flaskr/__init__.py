@@ -23,7 +23,9 @@ def create_app():
     def create_visit(payload):
         body = request.get_json()
 
-        LOG.debug("entered create_visit() endpoint {}", payload)
+        LOG.debug("body %s", body.get('patient_id', None))
+
+        LOG.debug("entered create_visit() endpoint %s", payload)
 
         '''
         try:

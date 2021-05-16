@@ -105,7 +105,7 @@ Currently, Docker-Compose is been used to create two containers: a web container
     
     ```bash
     # AUTHO Authentication API -> Get Token -> Resource Owner Password
-    https://{AUTH0_DOMAIN}/oauth/token
+    POST https://{AUTH0_DOMAIN}/oauth/token
     ```
     The users have already been created in AUTH0 and their credentials (username and password) are maintained in environment variables, which are located in the file shown below. 
     Note, that these users are used for local development, and automated testing purposes. In the web deployment section, we will use a more secure method to login and get the JWT token.
@@ -433,19 +433,21 @@ The main difference between them is the host address: Local host vs web host, an
 
 #### Resource endpoint library
 
-- POST /nurses/create
+- POST /visits/create
 
   - General: 
-    - Creates a new nurse user record
+    - Creates a new visit record
   - JSON Request Arguments:
-    - name [string] : Name for new nurse
+    - Patient [string] : AUTH0 ID of patient
+  - Permission:
+    - POST:VISITS
   - Return: 
-    - Returns a dictionary with information about the recently created nurse user record, and its newly assigned id.
+    - Returns a dictionary with information about the recently created visit record.
   
   - Sample Input:
   
     ```bash
-    $ curl -X POST http://0.0.0.0:8080/nurses/create -H "Content-Type: application/json" -d '{"name":"Alvaro"}'
+    curl --request POST --url $BASE_URL/visits/create --header "Authorization: Bearer $USER_JWT_TOKEN" --header "Content-Type: application/json" --data '{"patient_id":"543525"}'
     ```
   - Output: 
     

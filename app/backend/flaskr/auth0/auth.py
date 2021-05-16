@@ -162,8 +162,7 @@ def verify_decode_jwt(token):
             }, 400)
 
 '''
-Gets active user information such as nickname, name, picture, email
-based on the 'Get User Info' AUTH0 API
+Gets detailed user information from the user JWT token
 
 INPUT: None
 OUTPUT: [dictionary] json data
