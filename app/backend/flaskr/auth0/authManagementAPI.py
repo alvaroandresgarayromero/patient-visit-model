@@ -119,9 +119,12 @@ class Auth0ManagementAPI:
         return list(lut_long[logical_idx])
 
     '''
-
+    From the Class 'list_users' element, filter requested users 
     INTPUT: 
-        a_requested_role [string] : The role to filter the user list
+        a_role [list] : A list of role of type strings: 'Nurse', 'Patient', 'Admin'
+    OUTPUT: 
+        users [list] : A list of users with the requested role
+                
     '''
 
     def filter_users_by_role(self, a_role):
@@ -184,8 +187,7 @@ class Auth0ManagementAPIBuilder:
         bearer_token = f'Bearer {self.root.access_token}'
         header = {'Authorization': bearer_token}
 
-        respond = requests.get(url,
-                               headers=header)
+        respond = requests.get(url, headers=header)
         oauth = respond.json()
 
         self.root.list_users = list(map(lambda element: element.get('user_id'), oauth))
@@ -205,8 +207,7 @@ class Auth0ManagementAPIBuilder:
         bearer_token = f'Bearer {self.root.access_token}'
         header = {'Authorization': bearer_token}
 
-        respond = requests.get(url,
-                               headers=header)
+        respond = requests.get(url, headers=header)
         oauth = respond.json()
         self.root.list_roles = oauth
         return self

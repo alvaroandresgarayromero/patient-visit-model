@@ -425,8 +425,12 @@ The main difference between them is the host address: Local host vs web host, an
   - User 4 - Patient Role
   
 Lastly, AUTH0 provides their own management API to interact with the users and roles. For instance, searching a particular user, decoding user id, etc.
-In order to interact with the AUTH0 management api a special management token needs to be used. This token contains permissions to access the 
-AUTH0 API endpoints. 
+In order to interface with the AUTH0 management API, a special management token is required. This token contains permissions to access the 
+AUTH0 API endpoints. Support to build within python is provided in the file below:
+
+```bash
+flaskr/auth0/authManagementAPI.py
+```
   
 
 #### Error Handling

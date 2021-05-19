@@ -183,6 +183,17 @@ def get_active_user_info():
 
     return json.loads(data)
 
+
+'''
+INPUT: 
+    a_username [string]: email of AUTH0 user
+    a_password [string]: password of AUTH0 user
+
+OUTPUT:
+    respond [dict] : token information in dictionary format 
+                     where 'access_token' key is the JWT token.
+'''
+
 '''
 @TODO implement @requires_auth(permission) decorator method
     @INPUTS
