@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from . import config
 from ..logprint import _logger
 
-
 LOG = _logger(__name__)
 
 db = SQLAlchemy()
@@ -29,23 +28,23 @@ class Visit(db.Model):
     __tablename__ = 'Visit'
 
     id = Column(db.Integer, primary_key=True)
-    nurse_auth0_id = Column(db.String, nullable=False)
-    patient_auth0_id = Column(db.String, nullable=False)
+    nurse_id = Column(db.String, nullable=False)
+    patient_id = Column(db.String, nullable=False)
     visit_time = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, nurse_auth0_id, patient_auth0_id, visit_time):
-        self.nurse_auth0_id = nurse_auth0_id
-        self.patient_auth0_id = patient_auth0_id
+    def __init__(self, nurse_id, patient_id, visit_time):
+        self.nurse_id = nurse_id
+        self.patient_id = patient_id
         self.visit_time = visit_time
 
-    def format(self):
+    def format(self, nurse_name, patient_name):
         return {
             'id': self.id,
-            'nurse_auth0_id': self.nurse_auth0_id,
-            'nurse_name': 'na',
-            'patient_auth0_id': self.patient_auth0_id,
-            'patient_name': 'na',
-            'visit_time': self.visit_time
+            'nurse_id': self.nurse_id,
+            'nurse_name': nurse_name,
+            'patient_id': self.patient_id,
+            'patient_name': patient_name,
+            'visit_time': self.visit_time.strftime("%m/%d/%Y, %H:%M:%S")
         }
 
     def insert(self):

@@ -18,6 +18,7 @@ OUTPUT:
     access_token [string]: JWT token of user
     
 NOTE: User must be registered (in the database) of AUTH0 
+NOTE: To see registered users credentials, see auth0.env file. 
 NOTE: This function is useful for scripts that would 
       like to automate the JWT retrieval for testing purposes
 '''

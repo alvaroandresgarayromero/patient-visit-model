@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request, abort
 from .db.models import *
 from .auth0 import auth
 from .logprint import _logger
+from .auth0.authManagementAPI import *
+from datetime import *
 
 LOG = _logger('flaskr.__init__')
 
@@ -10,6 +12,14 @@ def create_app():
 
     app = Flask(__name__)
     setup_db(app)
+
+    # build Auth0 Management API
+    builder = Auth0ManagementAPIBuilder()
+    auth0api = builder.load_base_url(). \
+        load_access_token(). \
+        load_users(). \
+        load_roles(). \
+        build()
 
     @app.route('/', methods=['GET'])
     @app.route('/login-results', methods=['GET'])
@@ -23,25 +33,21 @@ def create_app():
     def create_visit(payload):
         body = request.get_json()
 
-        LOG.debug("body %s", body.get('patient_id', None))
-
-        LOG.debug("entered create_visit() endpoint %s", payload)
-
-        '''
         try:
-            visit = Visit(nurse_auth0_id=body.get('nurse_auth0_id'),
-                          patient_auth0_id=body.get('nurse_auth0_id'),
-                          visit_time=body.get('visit_time'))
+            visit = Visit(nurse_id=payload.get('sub'),
+                          patient_id=body.get('patient_id'),
+                          visit_time=datetime.now())
+
             visit.insert()
-            output = visit.format()
-            
+
+            names = auth0api.get_user_name([visit.nurse_id, visit.patient_id])
+            result = visit.format(names[0], names[1])
+
         except:
             abort(422)
-        '''
 
-        #return jsonify(output)
-
-        return auth.get_active_user_info()
+        return jsonify({'success': True,
+                        'data': result})
 
     '''
     @app.route('/nurses/<int:a_id>', methods=['GET'])

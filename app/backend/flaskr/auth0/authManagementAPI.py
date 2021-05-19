@@ -92,7 +92,7 @@ class Auth0ManagementAPI:
         return respond_list
 
     '''
-    Look up a requested role info such as the id and description 
+    Fetches role info such as the id and description 
 
     Supported Role Names: 'Admin', 'Patient', 'Nurse'
 
@@ -119,9 +119,11 @@ class Auth0ManagementAPI:
         return list(lut_long[logical_idx])
 
     '''
-    From the Class 'list_users' element, filter requested users 
+    Filter uses from 'list_users' element
+
     INTPUT: 
-        a_role [list] : A list of role of type strings: 'Nurse', 'Patient', 'Admin'
+        a_role [list] : A list of role of type dictionary. 
+                        ex see: obj.lut_role(['Patient'])
     OUTPUT: 
         users [list] : A list of users with the requested role
                 

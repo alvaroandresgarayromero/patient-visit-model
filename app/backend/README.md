@@ -75,11 +75,10 @@ Currently, Docker-Compose is been used to create two containers: a web container
     
       ```bash
       # To enter Docker Web Container Flask app 
-      $ docker exec -it <CONTAINER_ID or CONTAINER_NAME> /bin/bash
+      $ docker exec -it web_container_latest /bin/bash
     
-      # To get CONTAINER_ID or 
-      # use the CONTAINER_NAME currently 
-      # set to 'web_container_latest'
+      # where 'web_container_latest' is the CONTAINER_NAME  
+      # execute the command below to see the CONTAINER_NAME
       $ docker ps 
       ```
   
@@ -240,7 +239,7 @@ Currently, Docker-Compose is been used to create two containers: a web container
     - Step 1: The following script will generate the required URL to access the '/authorize' AUTH0 API endpoint in order to LOGIN a user into AUTH0 LOGIN PAGE
       
       ```bash
-      $ source flaskr/auth0/run_setup.sh 
+      $ source flaskr/auth0/auth0LoginBrowser.sh 
       ```
       
     - Step 2: Copy the URL, and paste it into your desired web-browser.
@@ -426,7 +425,7 @@ The main difference between them is the host address: Local host vs web host, an
   
 Lastly, AUTH0 provides their own management API to interact with the users and roles. For instance, searching a particular user, decoding user id, etc.
 In order to interface with the AUTH0 management API, a special management token is required. This token contains permissions to access the 
-AUTH0 API endpoints. Support to build within python is provided in the file below:
+AUTH0 API endpoints. Support to fetch within python is provided in the file below:
 
 ```bash
 flaskr/auth0/authManagementAPI.py
@@ -468,7 +467,10 @@ flaskr/auth0/authManagementAPI.py
   - Sample Input:
   
     ```bash
-    curl --request POST --url $BASE_URL/visits/create --header "Authorization: Bearer $USER_JWT_TOKEN" --header "Content-Type: application/json" --data '{"patient_id":"543525"}'
+    curl --request POST --url $BASE_URL/visits/create \
+    --header "Authorization: Bearer $USER_JWT_TOKEN" \
+    --header "Content-Type: application/json" \
+    --data '{"patient_id":"auth0|609584b8abea8d006a4dd478"}'
     ```
   - Output: 
     
