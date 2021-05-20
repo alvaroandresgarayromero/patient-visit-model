@@ -277,36 +277,108 @@ Requirements are organized in three sections where the keyword "context" on requ
 
 ### SRD
 
+- SRD_01 - Requirement:
+  - The software shall provide a method to 
+    support three client types: Patient, Nurse, Admin
+- SRD_02 - Context:
+  - Medical Data refers to
+    - assessment data such as vital signs
+    - administrative data such as who was the patient, who was the nurse, what time did they interact. 
+- SRD_03 - Requirement:
+  - The software shall provide an Admin client permission 
+    to create, read, update, and delete
+    medical data
+- SRD_04 - Requirement:
+  - The software shall provide a Nurse client permission to 
+    create, read, and update medical data
+- SRD_05 - Requirement:
+  - The software shall provide a Patient client permission to 
+    read medical data
+- SRD_06 - Requirement:
+  - The software shall provide a client with a 
+    method to document a visitation encounter with a patient client. 
+- SRD_07 - Requirement:
+  - The software shall provide a client with a 
+    method to document the vital signs of a patient client.  
+- SRD_08 - Requirement:
+  - The software shall provide a client with a 
+    method to read existing medical data of a patient client.
+- SRD_09 - Requirement:
+  - The software shall provide a client with a 
+    method to update existing medical data of a patient client.    
+- SRD_10 - Requirement:
+  - The software shall provide a client with a 
+    method to delete existing medical data of a patient client.    
+    
 ### SRS
-
+- SRS_01 - Requirement: 
+  - Satisfies: SRD_01, SRD_03, SRD_04, SRD_05
+  - The software shall interface with AUTH0 API to manage Patient, Nurse, and Admin clients identity, and permissions
+    during POST, GET, PATCH, and DELETE request commands.
+- SRS_02 - Requirement: 
+  - Satisfies: SRD_03
+  - The software shall permit POST, GET, PATCH, and DELETE requests during Admin clients request commands
+- SRS_03 - Requirement: 
+  - Satisfies: SRD_04
+  - The software shall permit POST, GET, and PATCH requests during Nurse clients request commands
+- SRS_04 - Requirement: 
+  - Satisfies: SRD_05
+  - The software shall permit GET requests during Patient clients request commands
+- SRD_05 - Context:
+  - A visit record is composed of a Patient, Nurse, and Date of encounter.
+- SRS_06 - Requirement: 
+  - Satisfies: SRD_06
+  - The software shall create visit records
+    during '/visits/create' POST request commands
+- SRS_07 - Requirement: 
+  - Satisfies: SRD_06, SRD_09
+  - The software shall update a visit record 
+    during '/visits/<int:value>' PATCH request commands
+- SRS_08 - Requirement: 
+  - Satisfies: SRD_06, SRD_10
+  - The software shall delete a visit record 
+    during '/visits/<int:value>' DELETE request commands
+- SRD_09 - Context:
+  - A vital sign record is composed of a patient temperature.
+- SRD_10 - Context:
+  - A patient record is composed of vital sign and visit records. 
+- SRS_11 - Requirement: 
+  - Satisfies: SRD_07
+  - The software shall create vital sign records
+    during '/vital-signs/create' POST request commands
+- SRS_12 - Requirement: 
+  - Satisfies: SRD_06, SRD_07, SRD_08
+  - The software shall respond with a patient record
+    during '/patients/<int:value>' GET request commands
+- SRS_13 - Requirement: 
+  - Satisfies: SRD_07, SRD_09
+  - The software shall update a vital sign record 
+    during '/vital-signs/<int:value>' PATCH request commands
+- SRS_14 - Requirement: 
+  - Satisfies: SRD_07, SRD_10
+  - The software shall delete a vital sign record 
+    during '/vital-signs/<int:value>' DELETE request commands
+    
 ### STP
 
-- STP_0 - Context
+- STP_00 - Context
 
   A test must complete the test suite with no errors in order to be considered a PASS. 
   A test suite that does not complete the entirety of the test is considered a FAILURE.
   
-    - Step 1: Determine if the JWT token need to be updated. These are maintained in environment variables. (see Getting Started -> Authorization )
-      - b) Log into each registered user to get new JWT tokens 
-      - a) Update the user JWT environment variables
-        
-        ```bash
-        flaskr/auth0/auth0.env
-        ```
-
-    - Step 2: Go to app/backend/ and then create and run the docker container. 
+    - Step 1: In app/backend/, create and run the docker container 
   
       ```bash
       $ docker-compose up
       ```
       
-    - Step 3: Enter the web docker container
+    - Step 2: Enter the web docker container
       
       ```bash
       $ docker exec -it web_container_latest /bin/bash
       ```
          
-    - Step 4: Run the tests inside the docker container 
+    - Step 3: Run the tests inside the docker container 
       
         - To run individual tests, follow the ‘STP-XX Requirement’ instructions
       
@@ -321,10 +393,90 @@ Requirements are organized in three sections where the keyword "context" on requ
         ```
       
 - STP_01 - Requirement
+  - Satisfies: SRS_01, SRD_02
+  - Verify that the software can access the expected
+    endpoints during Admin client request commands as specified below.
+      - POST '/visits/create' endpoint
+      - PATCH and DELETE '/visits/<int:value>' endpoints
+      - GET'/patients/<int:value>' endpoint
+      - POST '/vital-signs/create' endpoint
+      - PATCH, DELETE '/vital-signs/<int:value>' endpoints
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:  
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_01
+      ```  
+    - Pass/Fail results will be displayed on the command line
+- STP_02 - Requirement
+  - Satisfies: SRS_01, SRD_03
+  - Verify that the software can access the expected 
+    endpoints during Nurse client request commands as specified below.
+      - POST '/visits/create' endpoint
+      - PATCH '/visits/<int:value>' endpoints
+      - GET '/patients/<int:value>' endpoint
+      - POST '/vital-signs/create' endpoint
+      - PATCH '/vital-signs/<int:value>' endpoints
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:  
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_02
+      ```  
+    - Pass/Fail results will be displayed on the command line
+- STP_03 - Requirement
+  - Satisfies: SRS_01, SRD_03
+  - Verify that the software asserts when accessing unauthorized 
+    endpoints during Nurse client request commands as specified below.
+      - DELETE '/visits/<int:value>' endpoints 
+      - DELETE '/vital-signs/<int:value>' endpoints
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:  
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_03
+      ```  
+    - Pass/Fail results will be displayed on the command line
+- STP_04 - Requirement
+  - Satisfies: SRS_01, SRS_04
+  - Verify that the software can access the expected 
+    endpoints during Patient client request commands as specified below.
+      - GET '/patients/<int:value>' endpoint
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:  
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_04
+      ```  
+    - Pass/Fail results will be displayed on the command line
+- STP_05 - Requirement
+  - Satisfies: SRS_01, SRS_04
+  - Verify that the software asserts when accessing unauthorized  
+    endpoints during Patient client request commands as specified below.
+      - POST '/visits/create' endpoint
+      - PATCH and DELETE '/visits/<int:value>' endpoints
+      - POST '/vital-signs/create' endpoint
+      - PATCH, DELETE '/vital-signs/<int:value>' endpoints
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:  
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_05
+      ```  
+    - Pass/Fail results will be displayed on the command line
+- STP_06 - Requirement
+  - Satisfies: SRS_06
+  - Verify that the software creates a visit record 
+    during ‘/visits/create’ POST request commands.
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:  
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_06
+      ```  
+    - Pass/Fail results will be displayed on the command line
 
-
-
-
+  
 ## API Reference:
 
 ### Getting Started
@@ -341,7 +493,9 @@ Requirements are organized in three sections where the keyword "context" on requ
   
 - Web Host: 
   
-    Hosted in Heroku using free web dyno. This means that the app will go to sleep if inactive for 30 minutes. Upon incoming traffic, then it will be woken up after a short delay.
+    Hosted in Heroku using free web dyno. 
+    This means that the app will go to sleep if inactive for 30 minutes. 
+    Upon incoming traffic, then it will be woken up after a short delay.
 
     ```bash
     https://patient-visit-model.herokuapp.com/
@@ -452,6 +606,48 @@ flaskr/auth0/authManagementAPI.py
    - 422: Not Processable
 
 #### Resource endpoint library
+
+There are two main environment variables that need to be 
+initialized prior to running the curl endpoint examples. 
+These environment variables are located in the setup.sh file. 
+
+- $BASE_URL - This is the base URL as described in the 'Base URL' section
+
+- $USER_JWT_TOKEN - This is the user JWT token. By default, the ADMIN user JWT token is saved
+
+
+- Verify the following steps:
+
+  - Step 1: source the setup.sh bash file.
+  
+      ```bash
+      # initializes environment variables 
+      source flaskr/auth0/setup.sh
+      ```
+    
+  - Step 2: If the $USER_JWT_TOKEN has expired, then a new one
+  can be generated. 
+    
+      ```bash
+      # get URL to login. 
+      # The file will echo the URL on the terminal. 
+      # Copy the URL and paste it in a browser.    
+      source flaskr/auth0/auth0LoginBrowser.sh
+      ```
+    
+       ```bash
+      # In the browser, the auth0 user credential will be requested. 
+      # If you'd like permission for every endpoint then login as ADMIN user.
+      # The user credentials are located in...
+      flaskr/auth0/setup.sh
+      ```
+    
+       ```bash
+      # Update the JWT token environment variable with the new JWT token 
+      # In flaskr/auth0/setup.sh.
+      # Note don't forget to source the file for the update to be configured 
+      export USER_JWT_TOKEN=<NEW JWT TOKEN>
+      ```
 
 - POST /visits/create
 
