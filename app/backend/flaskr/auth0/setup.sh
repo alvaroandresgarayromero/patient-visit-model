@@ -32,7 +32,7 @@ export PATIENT2_TOKEN="NONE"
 ADMIN_EMAIL="admin@nursevisitmodel.com"
 NURSE_EMAIL="nurse@nursevisitmodel.com"
 PATIENT_1_EMAIL="patient_nursepatientmodel_1@gmail.com"
-PATIENT_1_EMAIL="patient_nursepatientmodel_2@gmail.com"
+PATIENT_2_EMAIL="patient_nursepatientmodel_2@gmail.com"
 
 USERS_PASSWORD="Alvaro123"
 

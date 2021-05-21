@@ -40,8 +40,10 @@ def create_app():
 
             visit.insert()
 
-            names = auth0api.get_user_name([visit.nurse_id, visit.patient_id])
-            result = visit.format(names[0], names[1])
+            selection = Visit.query.get(visit.id)
+
+            names = auth0api.get_user_name([selection.nurse_id, selection.patient_id])
+            result = selection.format(names[0], names[1])
 
         except:
             abort(422)
