@@ -4,7 +4,7 @@ from flaskr import create_app
 from flaskr.auth0 import auth0LoginMachine
 from flaskr.db.models import setup_db
 
-# create a test database in the same postgres container
+# test database is its own container and port, but has the same credentials.
 user = os.environ.get('POSTGRES_USER_APP', None)
 password = os.environ.get('POSTGRES_PASSWORD_APP', None)
 host = os.environ.get('POSTGRES_CONTAINER_NAME_TEST', None)
@@ -49,6 +49,11 @@ class ApplicationSimulation:
         return data
 
     def create_visit(self, patient_id):
+        """
+        DESCRIPTION: Simulates creating a new visit record
+        INPUT: patient_id [string]: AUTH0 user id
+        OUTPUT: data [dictionary]: response from query with new data or error
+        """
         query = '/visits/create'
         header = {"Authorization": f"Bearer {self.access_token}"}
         payload = {"patient_id": patient_id}
@@ -60,14 +65,20 @@ class ApplicationSimulation:
 
         return data
 
-    def update_visit(self, patient_id):
-        query = '/visits/create'
+    def update_visit(self, visit_id, patient_id):
+        """
+        DESCRIPTION: Simulates updating an existing visit record
+        INPUT: visit_id [integer]: Visit unique primary ID key of the Visit Table
+               patient_id [string]: AUTH0 user id
+        OUTPUT: data [dictionary]: response from query with update data or error
+        """
+        query = f'/visits/{visit_id}'
         header = {"Authorization": f"Bearer {self.access_token}"}
         payload = {"patient_id": patient_id}
 
-        server_response = self.client().post(query,
-                                             headers=header,
-                                             json=payload)
+        server_response = self.client().patch(query,
+                                              headers=header,
+                                              json=payload)
         data = server_response.get_json()
 
         return data

@@ -21,6 +21,11 @@ including error handling, enabling role based authentication and roles-based acc
 with Autho0 (third-party authentication software as a service API), running Docker Containers, hosting the application live via Heroku,
 executing unit test, creating requirements, and documentation of a web API.
 
+[Getting Started](#Getting Started) |
+[Development Environment](#Development Environment) |
+[Web Deployment Development](#Web Deployment Development) | 
+
+
 ## Getting Started:
 
 ### Development Environment
@@ -83,23 +88,10 @@ Currently, Docker-Compose is been used to create two containers: a web container
       ```
   
       ```bash
-      # To enter Docker Database Container 
+      # To enter Docker Database Container, where the password is defined in the .env file 
       $ psql -h localhost -p 5432 -d patientnursedb -U postgres --password
-        Password: 
-    
-      # NOTE: where the password is defined in the flaskr/db/db.evn file
+        Password: ${POSTGRES_PASSWORD_APP}
       ```
-    
-      ```bash
-      # Copy Docker Database Container data into a filename "nurse-patient.psql'
-      $ pg_dump patientnursedb --host localhost --port 5432 --username postgres > nurse-patient.sql
-        Password: 
-    
-      # NOTE: where the password is defined in the flaskr/db/db.evn file
-      # NOTE: postgres versions from container and the local computer must be the same 
-      #       or else a miss-match error will occur. 
-      ```
-    
   
     
   - Verify Server Is Running (Quick Test)
@@ -377,12 +369,49 @@ Requirements are organized in three sections where the keyword "context" on requ
   A test must complete the test suite with no errors in order to be considered a PASS. 
   A test suite that does not complete the entirety of the test is considered a FAILURE.
   
-    - Step 1: In app/backend/, create and run the docker container 
+    - Step 1: 
   
       ```bash
+      #In app/backend/, create and run the docker container. 
       $ docker-compose up
       ```
+      NOTE: At the beginning of time, docker will create and initialize a test database container.
+      This test container is populated with sql data. This is done in order to support tests
+      that require data to be already in the database.
       
+      - [optional] Update SQL data that is loaded into database test container:
+      
+        ```bash
+        # SQL data file that is read by the test database container
+        $ flaskr/db/nurse-patient.sql
+        ```
+  
+        ```bash
+        # Create new "nurse-patient.sql' file. 
+        # In this example, the sql data in the docker container with PORT 5432 
+        # is dumped to the tester local computer. 
+        $ pg_dump patientnursedb --host localhost --port 5432 --username postgres > nurse-patient.sql
+          Password: ${POSTGRES_PASSWORD_APP}
+      
+        # NOTE: where the password is defined in the .env file
+        # NOTE: postgres versions from container and the local computer must be the same 
+        #       or else a miss-match error will occur. 
+        # NOTE: the nurse-patient.sql must be placed in the path that docker is looking for. 
+        ```
+        
+        ```bash
+        # Remove the test database container in order to trigger a new initialization process,
+        # and then create/run the container. The container name is defined in the .env file.
+        $ docker container rm ${POSTGRES_CONTAINER_NAME_TEST}
+        $ docker-compose up
+        ```
+      
+        ```bash
+        # Enter the test database container to verify the data is there, where the password is defined in the .env file
+        $ psql -h localhost -p 5433 -d patientnursedb -U postgres --password
+          Password: ${POSTGRES_PASSWORD_APP}
+        ```
+        
     - Step 2: Enter the web docker container
       
       ```bash

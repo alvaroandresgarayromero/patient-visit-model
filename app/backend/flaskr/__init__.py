@@ -38,6 +38,7 @@ def create_app():
                           patient_id=body.get('patient_id'),
                           visit_time=datetime.now())
 
+            # fetching names also verifies whether the user id exist in auth0
             names = auth0api.get_user_name([visit.nurse_id, visit.patient_id])
 
             visit.insert()
@@ -51,6 +52,32 @@ def create_app():
 
         return jsonify({'success': True,
                         'data': result})
+
+    @app.route('/visits/<int:a_id>', methods=['PATCH'])
+    @auth.requires_auth(permission='update:visits')
+    def update_visit(payload, a_id):
+        body = request.get_json()
+
+        try:
+            update_patient = body.get('patient_id')
+
+            visit = Visit.query.get(a_id)
+            visit.patient_id = update_patient
+
+            # fetching names also verifies whether the user id exist in auth0
+            names = auth0api.get_user_name([visit.nurse_id, visit.patient_id])
+
+            visit.update()
+
+            selection = Visit.query.get(a_id)
+            result = selection.format(names[0], names[1])
+
+        except:
+            abort(422)
+
+        return jsonify({'success': True,
+                        'data': result})
+
 
     '''
     @app.route('/nurses/<int:a_id>', methods=['GET'])
