@@ -7,7 +7,7 @@ from flaskr.db.models import setup_db
 # create a test database in the same postgres container
 user = os.environ.get('POSTGRES_USER_APP', None)
 password = os.environ.get('POSTGRES_PASSWORD_APP', None)
-host = os.environ.get('POSTGRES_CONTAINER_NAME_APP', None)
+host = os.environ.get('POSTGRES_CONTAINER_NAME_TEST', None)
 database = os.environ.get('POSTGRES_DB_APP', None)
 port = os.environ.get('POSTGRES_PORT_TEST', None)
 
