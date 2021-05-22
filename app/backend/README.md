@@ -21,9 +21,9 @@ including error handling, enabling role based authentication and roles-based acc
 with Autho0 (third-party authentication software as a service API), running Docker Containers, hosting the application live via Heroku,
 executing unit test, creating requirements, and documentation of a web API.
 
-[Getting Started](#Getting Started) |
-[Development Environment](#Development Environment) |
-[Web Deployment Development](#Web Deployment Development) | 
+[Getting Started](#Getting-Started) |
+[Development Environment](#Development-Environment) |
+[Web Deployment Development](#Web-Deployment-Development) | 
 
 
 ## Getting Started:
