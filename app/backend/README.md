@@ -24,7 +24,9 @@ executing unit test, creating requirements, and documentation of a web API.
 [Getting Started](#Getting-Started) |
 [Development Environment](#Development-Environment) |
 [Web Deployment Development](#Web-Deployment-Development) | 
-
+[Tests](#Tests) |
+[BackEnd Requirements](#BackEnd-Requirements) |
+[API Reference](#API-Reference) |
 
 ## Getting Started:
 
@@ -265,7 +267,6 @@ Currently, Docker-Compose is been used to create two containers: a web container
     
     For more information, about the AUTH0 configurations been used, see the 'API Reference' section.
   
-
 ### Tests
 
 Tests are defined in the requirement section. 
@@ -525,8 +526,7 @@ Requirements are organized in three sections where the keyword "context" on requ
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_07
       ```  
-    - Pass/Fail results will be displayed on the command line
-
+    - Pass/Fail results will be displayed on the command line 
   
 ## API Reference:
 
