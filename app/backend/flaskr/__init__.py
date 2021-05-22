@@ -38,11 +38,12 @@ def create_app():
                           patient_id=body.get('patient_id'),
                           visit_time=datetime.now())
 
+            names = auth0api.get_user_name([visit.nurse_id, visit.patient_id])
+
             visit.insert()
 
             selection = Visit.query.get(visit.id)
 
-            names = auth0api.get_user_name([selection.nurse_id, selection.patient_id])
             result = selection.format(names[0], names[1])
 
         except:

@@ -1,10 +1,10 @@
 import os
 
-user = os.environ.get('POSTGRES_USER', None)
-password = os.environ.get('POSTGRES_PASSWORD', None)
-host = os.environ.get('POSTGRES_CONTAINER_NAME', None)
-database = os.environ.get('POSTGRES_DB', None)
-port = os.environ.get('POSTGRES_PORT', None)
+user = os.environ.get('POSTGRES_USER_APP', None)
+password = os.environ.get('POSTGRES_PASSWORD_APP', None)
+host = os.environ.get('POSTGRES_CONTAINER_NAME_APP', None)
+database = os.environ.get('POSTGRES_DB_APP', None)
+port = os.environ.get('POSTGRES_PORT_APP', None)
 
 if host is None:
     # deployment development with Heroku

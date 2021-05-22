@@ -13,8 +13,8 @@ setup_db(app)
 """
 
 
-def setup_db(app):
-    LOG.debug("database url: %s", config.DATABASE_URL)
+def setup_db(app, database_url=config.DATABASE_URL):
+    LOG.debug("database url: %s", database_url)
 
     app.config["SQLALCHEMY_DATABASE_URI"] = config.DATABASE_URL
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

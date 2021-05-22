@@ -65,6 +65,8 @@ class Auth0ManagementAPI:
 
         user_namelist = list(map(lambda oauth: oauth.get('name'), respond_list))
 
+        assert None not in user_namelist, 'A user id was not found in Auth0 database'
+
         return user_namelist
 
     '''

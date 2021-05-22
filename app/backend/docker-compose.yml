@@ -6,16 +6,34 @@ services:
     container_name: web_container_latest
     env_file:
       - .env
-      - flaskr/auth0/auth0.env
-      - flaskr/db/db.env
+      - ./flaskr/auth0/auth0.env
+      - ./flaskr/db/db.env
     ports:
       -  ${PORT}:${PORT}
     volumes:
       - .:/app
   db:
-    container_name: ${POSTGRES_CONTAINER_NAME}
+    container_name: ${POSTGRES_CONTAINER_NAME_APP}
     image: postgres:latest
     env_file:
       - .env
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - ${POSTGRES_PORT_APP}:5432
+    environment:
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_APP}
+        - POSTGRES_USER=${POSTGRES_USER_APP}
+        - POSTGRES_DB=${POSTGRES_DB_APP}
+
+  db_test:
+    build:
+      context: .
+      dockerfile: ./flaskr/db/db_test.Dockerfile
+    container_name: ${POSTGRES_CONTAINER_NAME_TEST}
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT_TEST}:5432
+    environment:
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_APP}
+        - POSTGRES_USER=${POSTGRES_USER_APP}
+        - POSTGRES_DB=${POSTGRES_DB_APP}

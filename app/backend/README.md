@@ -87,8 +87,19 @@ Currently, Docker-Compose is been used to create two containers: a web container
       $ psql -h localhost -p 5432 -d patientnursedb -U postgres --password
         Password: 
     
-      # Where the password is defined in the flaskr/db/db.evn file
+      # NOTE: where the password is defined in the flaskr/db/db.evn file
       ```
+    
+      ```bash
+      # Copy Docker Database Container data into a filename "nurse-patient.psql'
+      $ pg_dump patientnursedb --host localhost --port 5432 --username postgres > nurse-patient.sql
+        Password: 
+    
+      # NOTE: where the password is defined in the flaskr/db/db.evn file
+      # NOTE: postgres versions from container and the local computer must be the same 
+      #       or else a miss-match error will occur. 
+      ```
+    
   
     
   - Verify Server Is Running (Quick Test)
@@ -473,6 +484,17 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Run:  
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_06
+      ```  
+    - Pass/Fail results will be displayed on the command line
+- STP_07 - Requirement
+  - Satisfies: SRS_06
+  - Verify that the software asserts
+    during incorrect ‘/visits/create’ POST request commands.
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:  
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_07
       ```  
     - Pass/Fail results will be displayed on the command line
 
