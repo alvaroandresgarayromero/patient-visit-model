@@ -6,7 +6,6 @@ from .auth0.authManagementAPI import *
 from .api.routes import api
 from .db import config
 from . import commands
-import click
 
 LOG = _logger('flaskr.__init__')
 
@@ -17,6 +16,8 @@ def create_app(a_configclass=config.configs['development']):
     app = Flask(__name__)
 
     app.config.from_object(a_configclass())
+
+    print(app.app_context().app.config)
 
     db.init_app(app)
     commands.init_app(app)
