@@ -527,7 +527,16 @@ Requirements are organized in three sections where the keyword "context" on requ
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_07
       ```  
     - Pass/Fail results will be displayed on the command line 
-  
+ - STP_08 - Requirement
+  - Satisfies: SRS_07
+  - Verify that the software updates a visit record 
+    during ‘/visits/<int:a_id>’ PATCH request commands.
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:  
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_08
+       
 ## API Reference:
 
 ### Getting Started

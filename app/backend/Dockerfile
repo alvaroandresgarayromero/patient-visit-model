@@ -5,10 +5,16 @@ FROM python:3.9-buster
 WORKDIR /app
 COPY . /app
 
+# install system dependencies
+RUN apt-get update && apt-get install -y netcat
+
+# install python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# CMD runs in container
+
+# ENTRYPOING AND CMD execute once container has completed building
 # Deployment development: Heroku reads Dockerfile only, and environment variables are set inside Heroku
 # Local development: Environment variables are set by docker-compose in .env
-CMD gunicorn --bind 0.0.0.0:$PORT "flaskr:create_app()"
+CMD gunicorn --bind 0.0.0.0:$PORT "appserver:gunicorn_app"
+ENTRYPOINT ["/app/wait_for_db_container.sh"]

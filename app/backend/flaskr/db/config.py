@@ -1,24 +1,54 @@
 import os
 
-user = os.environ.get('POSTGRES_USER_APP', None)
-password = os.environ.get('POSTGRES_PASSWORD_APP', None)
-host = os.environ.get('POSTGRES_CONTAINER_NAME_APP', None)
-database = os.environ.get('POSTGRES_DB_APP', None)
-port = os.environ.get('POSTGRES_PORT_APP', None)
 
-if host is None:
-    # deployment development with Heroku
+class Config(object):
+    """Base config """
+    DEBUG = False
+    TESTING = False
+
+    USER = os.environ.get('POSTGRES_USER_APP', None)
+    PASSWORD = os.environ.get('POSTGRES_PASSWORD_APP', None)
+    HOST = None
+    DATABASE = os.environ.get('POSTGRES_DB_APP', None)
+    PORT = None
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self):
+        return f'postgresql://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}'
+
+
+class ProductionConfig(Config):
+    """Uses production database server in Heroku."""
+    # DATABASE_URL is defined inside Heroku
     DATABASE_URL_HEROKU = os.environ.get('DATABASE_URL', None)
 
-    assert DATABASE_URL_HEROKU is not None, 'DATABASE was not found during initialization routine. ' \
-                                            'NOTE that local development such as tests need to be ran ' \
-                                            'from a Docker Container. See Local Development README for more info'
+    if DATABASE_URL_HEROKU is not None:
+        # SQLAlchemy 1.4 removed the deprecated postgres:// dialect name,
+        # the postgresql must be used now. However, Heroku hasn't updated this
+        # on their end. So let's take care of it here.
+        SQLALCHEMY_DATABASE_URI = 'postgresql' + DATABASE_URL_HEROKU.replace('postgres', '')
 
-    # SQLAlchemy 1.4 removed the deprecated postgres:// dialect name,
-    # the postgresql must be used now. However, Heroku hasn't updated this
-    # on their end. So let's take care of it here.
-    DATABASE_URL = 'postgresql' + DATABASE_URL_HEROKU.replace('postgres', '')
 
-else:
-    # local development with docker-compose container
-    DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{database}'
+class DevelopmentConfig(Config):
+    """Uses development database server in docker container."""
+    HOST = os.environ.get('POSTGRES_CONTAINER_NAME_APP', None)
+    PORT = os.environ.get('POSTGRES_PORT_APP', None)
+    DEBUG = True
+
+
+
+class TestingConfig(Config):
+    """Uses test database server in docker container."""
+    HOST = os.environ.get('POSTGRES_CONTAINER_NAME_TEST', None)
+    PORT = os.environ.get('POSTGRES_PORT_TEST', None)
+    DEBUG = True
+    TESTING = True
+
+
+configs = {'development': DevelopmentConfig,
+           'test': TestingConfig,
+           'production': ProductionConfig,
+           'default': ProductionConfig
+           }

@@ -68,7 +68,8 @@ ALTER TABLE ONLY public."Visit" ALTER COLUMN id SET DEFAULT nextval('public."Vis
 --
 
 COPY public."Visit" (id, nurse_id, patient_id, visit_time) FROM stdin;
-1	auth0|609584175f2168006b5c08a6	auth0|609584e057af210069a6e4f1	2021-05-22 03:01:18.113178
+1	auth0|609584175f2168006b5c08a6	auth0|609584b8abea8d006a4dd478	2021-05-24 23:06:01.553174
+2	auth0|609584175f2168006b5c08a6	auth0|609584b8abea8d006a4dd478	2021-05-24 23:06:16.097839
 \.
 
 
@@ -76,7 +77,7 @@ COPY public."Visit" (id, nurse_id, patient_id, visit_time) FROM stdin;
 -- Name: Visit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Visit_id_seq"', 1, true);
+SELECT pg_catalog.setval('public."Visit_id_seq"', 2, true);
 
 
 --

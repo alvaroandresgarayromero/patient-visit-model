@@ -2,14 +2,8 @@ import unittest
 from flaskr.auth0.authManagementAPI import *
 from flaskr import create_app
 from flaskr.auth0 import auth0LoginMachine
-from flaskr.db.models import setup_db
-
-# test database is its own container and port, but has the same credentials.
-user = os.environ.get('POSTGRES_USER_APP', None)
-password = os.environ.get('POSTGRES_PASSWORD_APP', None)
-host = os.environ.get('POSTGRES_CONTAINER_NAME_TEST', None)
-database = os.environ.get('POSTGRES_DB_APP', None)
-port = os.environ.get('POSTGRES_PORT_TEST', None)
+from flaskr.db.models import Visit, db
+from flaskr.db import config
 
 # AUTH0 registered user credentials
 ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', None)
@@ -23,13 +17,15 @@ class ApplicationSimulation:
     """This class simulates the patient-visit-model endpoints"""
 
     def __init__(self, access_token):
-        """Define variables and initialize app."""
-        self.app = create_app()
+        """Define variables and initialize test app context."""
+        self.app = create_app(config.configs['test'])
+        self.ctx = self.app.app_context()
+        self.ctx.push()
+
+        db.create_all()
+
         self.client = self.app.test_client
         self.access_token = access_token
-        self.database_path = f'postgresql://{user}:{password}@{host}:{port}/{database}'
-
-        setup_db(self.app, self.database_path)
 
     class Factory:
         @staticmethod
@@ -41,6 +37,10 @@ class ApplicationSimulation:
         @staticmethod
         def not_login_to_app():
             return ApplicationSimulation(None)
+
+    def __del__(self):
+        """destructor"""
+        self.ctx.pop()
 
     def index(self):
         query = '/'
@@ -128,6 +128,7 @@ class StpRunner(unittest.TestCase):
         patient = patients[0]
         result = simulate.create_visit(patient)
 
+        print(result)
         self.assertEqual(result['success'], True)
         self.assertEqual(result['data'].get('patient_id'), patient)
 
@@ -141,6 +142,23 @@ class StpRunner(unittest.TestCase):
         self.assertEqual(result['success'], False)
         self.assertEqual(result['error'], 422)
 
+    def STP_08(self):
+        """Test software updates visit record"""
+        simulate = ApplicationSimulation.Factory.login_to_app(ADMIN_EMAIL, USERS_PASSWORD)
+
+        # get a list of patient users
+        role = self.auth0api.lut_role(['Patient'])
+        patients = self.auth0api.filter_users_by_role(role)
+
+        # get first record in Visit
+        visit = Visit.query.all()
+        print(visit)
+
+        #patient = patients[1]
+        #result = simulate.update_visit(1, patient)
+
+        #self.assertEqual(result['success'], True)
+        #self.assertEqual(result['data'].get('patient_id'), patient)
 
 
 if __name__ == "__main__":
@@ -148,5 +166,6 @@ if __name__ == "__main__":
    # suite.addTest(StpRunner('STP_XX'))
     suite.addTest(StpRunner('STP_06'))
    # suite.addTest(StpRunner('STP_07'))
+   # suite.addTest(StpRunner('STP_08'))
 
     unittest.TextTestRunner().run(suite)

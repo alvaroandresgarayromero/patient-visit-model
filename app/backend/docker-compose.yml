@@ -1,3 +1,4 @@
+# local development uses docker-compose
 version: "3"
 services:
   web:
@@ -31,9 +32,13 @@ services:
     container_name: ${POSTGRES_CONTAINER_NAME_TEST}
     env_file:
       - .env
+    expose:
+      - "5433" # Publishes 5433 to other containers but NOT to host machine
     ports:
-      - ${POSTGRES_PORT_TEST}:5432
+      - "5433:5433"
     environment:
         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_APP}
         - POSTGRES_USER=${POSTGRES_USER_APP}
         - POSTGRES_DB=${POSTGRES_DB_APP}
+    command: -p 5433
+

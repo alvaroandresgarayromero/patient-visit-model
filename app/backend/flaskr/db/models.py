@@ -1,27 +1,11 @@
 from sqlalchemy import Column
 from flask_sqlalchemy import SQLAlchemy
-from . import config
 from ..logprint import _logger
+
 
 LOG = _logger(__name__)
 
 db = SQLAlchemy()
-
-"""
-setup_db(app)
-    binds a flask application and a SQLAlchemy service
-"""
-
-
-def setup_db(app, database_url=config.DATABASE_URL):
-    LOG.debug("database url: %s", database_url)
-
-    app.config["SQLALCHEMY_DATABASE_URI"] = config.DATABASE_URL
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db.app = app
-    db.init_app(app)
-    db.drop_all()
-    db.create_all()
 
 
 class Visit(db.Model):
