@@ -12,7 +12,7 @@ LOG = _logger('flaskr.__init__')
 FLASK_ENVIRONMENT = os.environ.get('FLASK_ENV', None)
 
 
-def create_app(a_configclass=config.configs['development']):
+def create_app(a_configclass=config.configs[FLASK_ENVIRONMENT]):
     app = Flask(__name__)
 
     app.config.from_object(a_configclass())
