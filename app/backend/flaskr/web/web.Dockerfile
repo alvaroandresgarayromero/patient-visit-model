@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y netcat
 # install python dependencies
 RUN pip install --upgrade pip
 
-COPY requirements.txt /tmp/
+COPY /flaskr/web/requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt
 
 
