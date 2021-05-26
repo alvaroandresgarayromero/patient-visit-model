@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y netcat
 
 # install python dependencies
 RUN pip install --upgrade pip
-RUN pip install -r /app/requirements.txt
+
+COPY requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt
 
 
 # ENTRYPOING AND CMD execute once container has completed building
