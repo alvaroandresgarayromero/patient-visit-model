@@ -1,4 +1,4 @@
-# heroku uses web.Dockerfile
+# heroku uses web.Dockerfile so this file must remain in root
 # local development uses docker-compose
 FROM python:3.9-buster
 
@@ -10,9 +10,7 @@ RUN apt-get update && apt-get install -y netcat
 
 # install python dependencies
 RUN pip install --upgrade pip
-
-COPY /flaskr/web/requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt
+RUN pip install -r /app/flaskr/web/requirements.txt
 
 
 # ENTRYPOING AND CMD execute once container has completed building
