@@ -14,6 +14,7 @@ else
 fi
 
 echo "Creating the database tables..."
+# gets executed at /app directory in container
 python3 appserver.py create-db
 echo "Tables created"
 

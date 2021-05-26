@@ -2,7 +2,9 @@
 version: "3"
 services:
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: ./flaskr/web/web.Dockerfile
     image: web_image_latest
     container_name: web_container_latest
     env_file:
@@ -27,8 +29,8 @@ services:
 
   db_test:
     build:
-      context: .
-      dockerfile: ./flaskr/db/db_test.Dockerfile
+      context: ./flaskr/db
+      dockerfile: db_test.Dockerfile
     container_name: ${POSTGRES_CONTAINER_NAME_TEST}
     env_file:
       - .env
