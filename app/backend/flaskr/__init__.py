@@ -1,8 +1,7 @@
+import os
 from flask import Flask, current_app
 from .db.models import *
-from .auth0 import auth
 from .logprint import _logger
-from .auth0.authManagementAPI import *
 from .api.routes import api
 from .db import config
 from . import commands

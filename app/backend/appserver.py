@@ -5,7 +5,7 @@ from flask.cli import FlaskGroup
 # appserver.py is expected here by web/web.Dockerfile
 # appserver.py is expected here by web/wait_for_db_container.sh
 
-# Running the server via Gunicorn (dockerfile looks for this file)
+# Running the server via Gunicorn (dockerfile Gunicorn looks for this file)
 gunicorn_app = create_app()
 
 

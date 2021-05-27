@@ -290,14 +290,13 @@ Requirements are organized in three sections where the keyword "context" on requ
     - administrative data such as who was the patient, who was the nurse, what time did they interact. 
 - SRD_03 - Requirement:
   - The software shall provide an Admin client permission 
-    to create, read, update, and delete
-    medical data
+    to create, read, update, and delete medical data
 - SRD_04 - Requirement:
   - The software shall provide a Nurse client permission to 
     create, read, and update medical data
 - SRD_05 - Requirement:
   - The software shall provide a Patient client permission to 
-    read medical data
+    read their own medical data
 - SRD_06 - Requirement:
   - The software shall provide a client with a 
     method to document a visitation encounter with a patient client. 
@@ -306,14 +305,17 @@ Requirements are organized in three sections where the keyword "context" on requ
     method to document the vital signs of a patient client.  
 - SRD_08 - Requirement:
   - The software shall provide a client with a 
-    method to read existing medical data of a patient client.
+    method to read medical data of a patient client.
 - SRD_09 - Requirement:
   - The software shall provide a client with a 
     method to update existing medical data of a patient client.    
 - SRD_10 - Requirement:
   - The software shall provide a client with a 
     method to delete existing medical data of a patient client.    
+
+
     
+
 ### SRS
 - SRS_01 - Requirement: 
   - Satisfies: SRD_01, SRD_03, SRD_04, SRD_05
@@ -362,7 +364,15 @@ Requirements are organized in three sections where the keyword "context" on requ
   - Satisfies: SRD_07, SRD_10
   - The software shall delete a vital sign record 
     during '/vital-signs/<int:value>' DELETE request commands
-    
+- SRS_15 - Requirement: 
+  - Satisfies: SRD_06, SRD_07, SRD_08
+  - The software shall respond with a patient record
+    during '/patients/<int:value>' GET request commands
+- SRS_16 - Requirement: 
+  - Satisfies: SRD_05, SRD_08
+  - The software shall respond with the user patient record
+    during '/patients/profile' GET request commands
+
 ### STP
 
 - STP_00 - Context
@@ -444,7 +454,7 @@ Requirements are organized in three sections where the keyword "context" on requ
       - PATCH, DELETE '/vital-signs/<int:value>' endpoints
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
-    - Run:  
+    - Run:
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_01
       ```  
@@ -460,7 +470,7 @@ Requirements are organized in three sections where the keyword "context" on requ
       - PATCH '/vital-signs/<int:value>' endpoints
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
-    - Run:  
+    - Run:
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_02
       ```  
@@ -473,7 +483,7 @@ Requirements are organized in three sections where the keyword "context" on requ
       - DELETE '/vital-signs/<int:value>' endpoints
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
-    - Run:  
+    - Run:
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_03
       ```  
@@ -485,7 +495,7 @@ Requirements are organized in three sections where the keyword "context" on requ
       - GET '/patients/<int:value>' endpoint
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
-    - Run:  
+    - Run:
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_04
       ```  
@@ -500,7 +510,7 @@ Requirements are organized in three sections where the keyword "context" on requ
       - PATCH, DELETE '/vital-signs/<int:value>' endpoints
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
-    - Run:  
+    - Run:
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_05
       ```  
@@ -511,7 +521,7 @@ Requirements are organized in three sections where the keyword "context" on requ
     during ‘/visits/create’ POST request commands.
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
-    - Run:  
+    - Run:
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_06
       ```  
@@ -522,21 +532,138 @@ Requirements are organized in three sections where the keyword "context" on requ
     during incorrect ‘/visits/create’ POST request commands.
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
-    - Run:  
+    - Run:
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_07
       ```  
     - Pass/Fail results will be displayed on the command line 
- - STP_08 - Requirement
+- STP_08 - Requirement
   - Satisfies: SRS_07
   - Verify that the software updates a visit record 
     during ‘/visits/<int:a_id>’ PATCH request commands.
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
-    - Run:  
+    - Run:
       ```bash
       $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_08
-       
+- STP_09 - Requirement
+  - Satisfies: SRS_07
+  - Verify that the software asserts
+    during incorrect ‘/visits/<int:a_id>’ PATCH request commands.
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_09
+- STP_10 - Requirement
+  - Satisfies: SRS_08
+  - Verify that the software deletes a visit record
+    during '/visits/<int:value>' DELETE request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_10
+- STP_11 - Requirement
+  - Satisfies: SRS_08
+  - Verify that the software asserts
+    during incorrect '/visits/<int:value>' DELETE request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_11
+- STP_12 - Requirement
+  - Satisfies: SRS_11
+  - Verify that the software creates vital sign records
+    during '/vital-signs/create' POST request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_12
+- STP_13 - Requirement
+  - Satisfies: SRS_11
+  - Verify that the software asserts
+    during '/vital-signs/create' POST request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_13
+- STP_14 - Requirement
+  - Satisfies: SRS_13
+  - Verify that the software updates a vital sign record 
+    during '/vital-signs/<int:value>' PATCH request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_14
+- STP_15 - Requirement
+  - Satisfies: SRS_13
+  - Verify that the software assert
+    during '/vital-signs/<int:value>' PATCH request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_15
+- STP_16 - Requirement
+  - Satisfies: SRS_14
+  - Verify that the software deletes vital sign record
+    during '/vital-signs/<int:value>' DELETE request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_16
+- STP_17 - Requirement
+  - Satisfies: SRS_14
+  - Verify that the software assert
+    during '/vital-signs/<int:value>' DELETE request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_17
+- STP_18 - Requirement
+  - Satisfies: SRS_12
+  - Verify that the software retrieves patient data
+    during '/patients/<int:value>' GET request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_18
+- STP_19 - Requirement
+  - Satisfies: SRS_12
+  - Verify that the software asserts
+    during '/patients/<int:value>' GET request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_19
+- STP_20 - Requirement
+  - Satisfies: SRS_16
+  - Verify that the software retrieves the user patient data
+    during '/patients/profile' GET request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_20
+- STP_21 - Requirement
+  - Satisfies: SRS_16
+  - Verify that the software asserts
+    during '/patients/profile' GET request commands
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_21
+
 ## API Reference:
 
 ### Getting Started
@@ -714,7 +841,8 @@ These environment variables are located in the setup.sh file.
   - General: 
     - Creates a new visit record
   - JSON Request Arguments:
-    - Patient [string] : AUTH0 ID of patient
+    - nurse_id [string] : AUTH0 ID of nurse
+    - patient_id [string] : AUTH0 ID of patient
   - Permission:
     - POST:VISITS
   - Return: 
@@ -726,70 +854,55 @@ These environment variables are located in the setup.sh file.
     curl --request POST --url $BASE_URL/visits/create \
     --header "Authorization: Bearer $USER_JWT_TOKEN" \
     --header "Content-Type: application/json" \
-    --data '{"patient_id":"auth0|609584b8abea8d006a4dd478"}'
+    --data '{"nurse_id":"auth0|60afcac9402eb000684ef198", "patient_id":"auth0|609584b8abea8d006a4dd478"}'
     ```
   - Output: 
     
     ```json
-    {"id":1,"name":"Alvaro"}
+    {
+      "data": {
+        "id": 1, 
+        "nurse_id": "auth0|60afcac9402eb000684ef198", 
+        "nurse_name": "Jonny Harper, RN", 
+        "patient_id": "auth0|609584b8abea8d006a4dd478", 
+        "patient_name": "Jose Garay", 
+        "visit_time": "05/27/2021, 18:50:08"
+      }, 
+      "success": true
+    }
     ```
-    
-- POST /patients/create
+
+- POST /vital-signs/create
 
   - General: 
-    - Creates a new patient user record
+    - Creates a new vital sign record
+    - NOTE: A visit record id is required, and it must not already
+    be in use with a vital sign record
   - JSON Request Arguments:
-    - name [string] : Name for new patient
-    - age [integer] : Age of user
-    - gender [string] : Gender of user
+    - visit_id [string] : Visit record unique id numerical number
+    - tempCelsius [string] : Patient temperature numerical number in celsious   
+  - Permission:
+    - POST:VITAL-SIGNS
   - Return: 
-    - Returns a dictionary with information about the recently created patient record, and its newly assigned id.
+    - Returns a dictionary with information about the recently created vital sign record.
+  
   - Sample Input:
   
     ```bash
-    $ curl -X POST http://0.0.0.0:8080/patients/create -H "Content-Type: application/json" -d '{"name":"Courtney", "age":27, "gender":"female"}'
+    curl --request POST --url $BASE_URL/vital-signs/create \
+    --header "Authorization: Bearer $USER_JWT_TOKEN" \
+    --header "Content-Type: application/json" \
+    --data '{"visit_id":"1", "tempCelsius":"37"}'
     ```
   - Output: 
     
     ```json
-    {"id":1, "age":27,"gender":"female","name":"Courtney"}
+    {
+      "data": {
+        "id": 1, 
+        "tempCelsius": 37, 
+        "visit_id": 1
+      }, 
+      "success": true
+    }
     ```
-    
-- GET /nurses/<int: a_id>
-
-  - General: 
-    - Fetches a nurse user from the nurse table
-  - Variable Rule Arguments:
-    - a_id [integer] : Respective ID of the nurse record
-  - Return: 
-    - Returns a dictionary with information about the nurse record with its assigned id.
-  - Sample Input:
-  
-    ```bash
-    $ curl -X GET http://0.0.0.0:8080/nurses/1
-    ```
-  - Output: 
-    
-    ```json
-    {"id":1,"name":"Alvaro"}
-    ```
-    
-- GET /patients/<int: a_id>
-
-  - General: 
-    - Fetches a patient user from the patient table
-  - Variable Rule Arguments:
-    - a_id [integer] : Respective ID of the patient record
-  - Return: 
-    - Returns a dictionary with information about the patient record with its assigned id.
-  - Sample Input:
-  
-    ```bash
-    $ curl -X GET http://0.0.0.0:8080/patients/1
-    ```
-  - Output: 
-    
-    ```json
-    {"id":1,"age":27,"gender":"female","name":"Courtney"}
-    ```
-
