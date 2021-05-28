@@ -1,5 +1,3 @@
-source setup.sh
-
 echo "Copy the URL below into your browser.
 Use incognito mode (ex: incognito chrome) to
 login with multiple users since logout is not supported"

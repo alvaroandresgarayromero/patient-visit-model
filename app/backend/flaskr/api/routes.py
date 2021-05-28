@@ -188,6 +188,79 @@ def delete_vitalsigns(payload, a_id):
                     'vitalsign_id': a_id})
 
 
+@api.route('/patients/search', methods=['GET'])
+@auth.requires_auth(permission='read:patient-data')
+def search_patient(payload):
+    body = request.get_json()
+
+    try:
+        patient_id = body.get('patient_id')
+
+        visits = Visit.query.filter_by(patient_id=patient_id).all()
+        assert visits != [], f'no patients found in visit record with id: {patient_id}'
+
+        result = format_visit_and_vital_sign_data(visits)
+
+    except exc.SQLAlchemyError:
+        visits.reset()
+        abort(404)
+    except:
+        abort(404)
+
+    return jsonify({'success': True,
+                    'data': result})
+
+
+@api.route('/patients/search/user', methods=['GET'])
+@auth.requires_auth(permission='read:restrictive-patient-data')
+def get_user_patient_record(payload):
+
+    try:
+        # use decoded payload data to get patient id (active user)
+        patient_id = payload.get('sub')
+
+        visits = Visit.query.filter_by(patient_id=patient_id).all()
+        assert visits != [], f'no patients found in visit record with id: {patient_id}'
+
+        result = format_visit_and_vital_sign_data(visits)
+
+    except exc.SQLAlchemyError:
+        visits.reset()
+        abort(404)
+    except:
+        abort(404)
+
+    return jsonify({'success': True,
+                    'data': result})
+
+
+'''
+Packages visits and vital sign data 
+
+INPUT: visits [list] : list of visit objects from Visit class
+OUTPUT: result [list] : Reformatted data 
+'''
+def format_visit_and_vital_sign_data(visits):
+    result = []
+    for visit in visits:
+        names = auth0api.get_user_name([visit.nurse_id,
+                                        visit.patient_id])
+
+        visit_format = visit.long_format(names[0], names[1])
+
+        if not visit.vitalsigns:
+            # no vital signs have been documented in this visit
+            vitalsign_format = []
+        else:
+            vitalsign_format = visit.vitalsigns[0].short_format()
+
+        element = {"visit": visit_format,
+                   "vitalSign": vitalsign_format}
+
+        result.append(element)
+    return result
+
+
 @api.errorhandler(400)
 def bad_request(error):
     return jsonify({

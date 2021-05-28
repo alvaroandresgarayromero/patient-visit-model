@@ -8,17 +8,20 @@ as a baseline of its main features.
 As part of the Full-Stack Udacity Nanodegree Capstone final project, 
 the scope of the nurse process web application will focus on the implementation of the Assessment feature. 
 This feature consists of supporting three user roles: Nurse, Patient, Admin. 
-The application uses AUTH0 for application and user authentication and permissions.
-The application uses POSTGRES DB with two main tables: visit and assessment.
-The visit table records the time the nurse and patient assessment occurred. 
-The assessment table records patient medical objective data such as vital signs. 
+The application uses AUTH0 for authentication and permissions for the application and user.
+The application uses POSTGRES DB with two main tables: visit and vitalsigns.
+The visit table records the time the nurse and patient assessment occurred, and
+the vital sign table records patient medical objective data such as a patient temperature. 
+It is important to note that one vital sign record exist per visit. It is not possible to 
+have more than one vital sign record per visit.
 
 By completing this project, the student will have had the opportunity to implement all
 concepts learned throughout the program, which include architecting relational database
 models in Python, utilizing SQLAlchemy to conduct database queries, 
 following RESTful principles of API development, structuring endpoints to respond to HTTP methods, 
 including error handling, enabling role based authentication and roles-based access control 
-with Autho0 (third-party authentication software as a service API), running Docker Containers, hosting the application live via Heroku,
+with Autho0 (third-party authentication software as a service API), running Docker Containers, 
+hosting the application live via Heroku,
 executing unit test, creating requirements, and documentation of a web API.
 
 [Getting Started](#Getting-Started) |
@@ -312,9 +315,7 @@ Requirements are organized in three sections where the keyword "context" on requ
 - SRD_10 - Requirement:
   - The software shall provide a client with a 
     method to delete existing medical data of a patient client.    
-
-
-    
+        
 
 ### SRS
 - SRS_01 - Requirement: 
@@ -367,11 +368,11 @@ Requirements are organized in three sections where the keyword "context" on requ
 - SRS_15 - Requirement: 
   - Satisfies: SRD_06, SRD_07, SRD_08
   - The software shall respond with a patient record
-    during '/patients/<int:value>' GET request commands
+    during '/patients/search' GET request commands
 - SRS_16 - Requirement: 
   - Satisfies: SRD_05, SRD_08
-  - The software shall respond with the user patient record
-    during '/patients/profile' GET request commands
+  - The software shall respond with the active patient user record
+    during '/patients/search/user' GET request commands
 
 ### STP
 
@@ -449,57 +450,78 @@ Requirements are organized in three sections where the keyword "context" on requ
     endpoints during Admin client request commands as specified below.
       - POST '/visits/create' endpoint
       - PATCH and DELETE '/visits/<int:value>' endpoints
-      - GET'/patients/<int:value>' endpoint
       - POST '/vital-signs/create' endpoint
       - PATCH, DELETE '/vital-signs/<int:value>' endpoints
+      - GET '/patients/search' endpoint
+
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_01
+      $ python3 -m unittest test_flaskr.StpRunner.STP_01
       ```  
     - Pass/Fail results will be displayed on the command line
+- STP_01_a - Requirement
+  - Satisfies: SRS_01, SRD_02
+  - Verify that the software asserts when accessing unauthorized 
+    endpoints during Admin client request commands as specified below.
+      - GET '/patients/search/user' endpoint
+
+  - Description:
+    - Execute steps in STP_00 to configure the test system for testing
+    - Run:
+      ```bash
+      $ python3 -m unittest test_flaskr.StpRunner.STP_01_a
+      ```  
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_02 - Requirement
   - Satisfies: SRS_01, SRD_03
   - Verify that the software can access the expected 
     endpoints during Nurse client request commands as specified below.
       - POST '/visits/create' endpoint
       - PATCH '/visits/<int:value>' endpoints
-      - GET '/patients/<int:value>' endpoint
       - POST '/vital-signs/create' endpoint
       - PATCH '/vital-signs/<int:value>' endpoints
+      - GET '/patients/search' endpoint
+
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_02
+      $ python3 -m unittest test_flaskr.StpRunner.STP_02
       ```  
     - Pass/Fail results will be displayed on the command line
+  
 - STP_03 - Requirement
   - Satisfies: SRS_01, SRD_03
   - Verify that the software asserts when accessing unauthorized 
     endpoints during Nurse client request commands as specified below.
       - DELETE '/visits/<int:value>' endpoints 
       - DELETE '/vital-signs/<int:value>' endpoints
+      - GET '/patients/search/user' endpoint
+
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_03
+      $ python3 -m unittest test_flaskr.StpRunner.STP_03
       ```  
     - Pass/Fail results will be displayed on the command line
+  
 - STP_04 - Requirement
   - Satisfies: SRS_01, SRS_04
   - Verify that the software can access the expected 
     endpoints during Patient client request commands as specified below.
-      - GET '/patients/<int:value>' endpoint
+      - GET '/patients/search/user' endpoint
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_04
+      $ python3 -m unittest test_flaskr.StpRunner.STP_04
       ```  
     - Pass/Fail results will be displayed on the command line
+  
 - STP_05 - Requirement
   - Satisfies: SRS_01, SRS_04
   - Verify that the software asserts when accessing unauthorized  
@@ -508,13 +530,16 @@ Requirements are organized in three sections where the keyword "context" on requ
       - PATCH and DELETE '/visits/<int:value>' endpoints
       - POST '/vital-signs/create' endpoint
       - PATCH, DELETE '/vital-signs/<int:value>' endpoints
+      - GET '/patients/search' endpoint
+    
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_05
+      $ python3 -m unittest test_flaskr.StpRunner.STP_05
       ```  
     - Pass/Fail results will be displayed on the command line
+  
 - STP_06 - Requirement
   - Satisfies: SRS_06
   - Verify that the software creates a visit record 
@@ -523,9 +548,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_06
+      $ python3 -m unittest test_flaskr.StpRunner.STP_06
       ```  
     - Pass/Fail results will be displayed on the command line
+  
 - STP_07 - Requirement
   - Satisfies: SRS_06
   - Verify that the software asserts
@@ -534,9 +560,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_07
+      $ python3 -m unittest test_flaskr.StpRunner.STP_07
       ```  
-    - Pass/Fail results will be displayed on the command line 
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_08 - Requirement
   - Satisfies: SRS_07
   - Verify that the software updates a visit record 
@@ -545,7 +572,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_08
+      $ python3 -m unittest test_flaskr.StpRunner.STP_08
+      ```
+    - Pass/Fail results will be displayed on the command line
+      
 - STP_09 - Requirement
   - Satisfies: SRS_07
   - Verify that the software asserts
@@ -554,7 +584,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_09
+      $ python3 -m unittest test_flaskr.StpRunner.STP_09
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_10 - Requirement
   - Satisfies: SRS_08
   - Verify that the software deletes a visit record
@@ -563,7 +596,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_10
+      $ python3 -m unittest test_flaskr.StpRunner.STP_10
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_11 - Requirement
   - Satisfies: SRS_08
   - Verify that the software asserts
@@ -572,7 +608,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_11
+      $ python3 -m unittest test_flaskr.StpRunner.STP_11
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_12 - Requirement
   - Satisfies: SRS_11
   - Verify that the software creates vital sign records
@@ -581,7 +620,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_12
+      $ python3 -m unittest test_flaskr.StpRunner.STP_12
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_13 - Requirement
   - Satisfies: SRS_11
   - Verify that the software asserts
@@ -590,7 +632,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_13
+      $ python3 -m unittest test_flaskr.StpRunner.STP_13
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_14 - Requirement
   - Satisfies: SRS_13
   - Verify that the software updates a vital sign record 
@@ -599,7 +644,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_14
+      $ python3 -m unittest test_flaskr.StpRunner.STP_14
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_15 - Requirement
   - Satisfies: SRS_13
   - Verify that the software assert
@@ -608,7 +656,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_15
+      $ python3 -m unittest test_flaskr.StpRunner.STP_15
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_16 - Requirement
   - Satisfies: SRS_14
   - Verify that the software deletes vital sign record
@@ -617,7 +668,10 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_16
+      $ python3 -m unittest test_flaskr.StpRunner.STP_16
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_17 - Requirement
   - Satisfies: SRS_14
   - Verify that the software assert
@@ -626,43 +680,45 @@ Requirements are organized in three sections where the keyword "context" on requ
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_17
+      $ python3 -m unittest test_flaskr.StpRunner.STP_17
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_18 - Requirement
   - Satisfies: SRS_12
   - Verify that the software retrieves patient data
-    during '/patients/<int:value>' GET request commands
+    during '/patients/search' GET request commands
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_18
+      $ python3 -m unittest test_flaskr.StpRunner.STP_18
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_19 - Requirement
   - Satisfies: SRS_12
   - Verify that the software asserts
-    during '/patients/<int:value>' GET request commands
+    during '/patients/search' GET request commands
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_19
+      $ python3 -m unittest test_flaskr.StpRunner.STP_19
+      ```
+    - Pass/Fail results will be displayed on the command line
+  
 - STP_20 - Requirement
   - Satisfies: SRS_16
-  - Verify that the software retrieves the user patient data
-    during '/patients/profile' GET request commands
+  - Verify that the software retrieves the active user patient data
+    during '/patients/search/user' GET request commands
   - Description:
     - Execute steps in STP_00 to configure the test system for testing
     - Run:
       ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_20
-- STP_21 - Requirement
-  - Satisfies: SRS_16
-  - Verify that the software asserts
-    during '/patients/profile' GET request commands
-  - Description:
-    - Execute steps in STP_00 to configure the test system for testing
-    - Run:
-      ```bash
-      $ python3 -m unittest test_flaskr.PatientVisitTestCase.STP_21
+      $ python3 -m unittest test_flaskr.StpRunner.STP_20
+      ```
+    - Pass/Fail results will be displayed on the command line
 
 ## API Reference:
 
@@ -747,22 +803,38 @@ The main difference between them is the host address: Local host vs web host, an
   - Identifier: $AUTH0_AUDIENCE 
   - Enable RBAC: On
   - Add Permissions in the Access Token: On
+  
+- Permissions: 
+  - patch:visits: Updates visit record	
+  - post:visits: Creates new visit record for patient-nurse encounter 
+  - delete:visits: Deletes visit record	
+  - post:vital-signs: Creates new vital sign record	
+  - patch:vital-signs: Updates vital sign record	
+  - delete:vital-signs: Deletes vital sign record 
+  - read:patient-data: Reads patient data (visits and vital sign data)	
+  - read:restrictive-patient-data: Reads patient data (visits and vital sign data)
 
 - Roles
-  - Admin: Admin has access to create, edit, delete & update
-  - Nurse: Nurse can create Assessment, Diagnosis, Planning, Implementation, and Evaluation of a particular patient. For now, Assessment visit is supported
-  - Patient: Patient can view their medical visit information
-  
-- Permissions: @todo
-  - Admin:  
+  - Admin: 
+    - patch:visits
+    - post:visits:
+    - delete:visits
+    - post:vital-signs
+    - patch:vital-signs
+    - delete:vital-signs
+    - read:patient-data
   - Nurse: 
+    - patch:visits
+    - post:visits:
+    - post:vital-signs
+    - patch:vital-signs
+    - read:patient-data
   - Patient:
-  
-- Users: In addition, four AUTH0 users have been pre-registered. To see their credentials see the flaskr/auth0/auth0.env file:
-  - User 1 - Admin role
-  - User 2 - Nurse role
-  - User 3 - Patient Role
-  - User 4 - Patient Role
+    - read:restrictive-patient-data
+
+- Users: In addition, 5 AUTH0 users have been pre-registered. 
+  To see their credentials see the flaskr/auth0/auth0.env file:
+
   
 Lastly, AUTH0 provides their own management API to interact with the users and roles. For instance, searching a particular user, decoding user id, etc.
 In order to interface with the AUTH0 management API, a special management token is required. This token contains permissions to access the 
@@ -794,13 +866,16 @@ flaskr/auth0/authManagementAPI.py
 
 #### Resource endpoint library
 
-There are two main environment variables that need to be 
+There are three main environment variables that need to be 
 initialized prior to running the curl endpoint examples. 
 These environment variables are located in the setup.sh file. 
 
-- $BASE_URL - This is the base URL as described in the 'Base URL' section
+- $BASE_URL - This is the base URL as described in the 'Base URL' section. 
+By Default, the BASE_URL is hosted by Heroku
 
-- $USER_JWT_TOKEN - This is the user JWT token. By default, the ADMIN user JWT token is saved
+- $ADMIN_TOKEN - This is the ADMIN user JWT token
+  
+- $PATIENT1_TOKEN - This is a PATIENT user JWT token
 
 
 - Verify the following steps:
@@ -812,7 +887,7 @@ These environment variables are located in the setup.sh file.
       source flaskr/auth0/setup.sh
       ```
     
-  - Step 2: If the $USER_JWT_TOKEN has expired, then a new one
+  - Step 2: If the users JWT tokens have expired, then a new one
   can be generated. 
     
       ```bash
@@ -824,8 +899,6 @@ These environment variables are located in the setup.sh file.
     
        ```bash
       # In the browser, the auth0 user credential will be requested. 
-      # If you'd like permission for every endpoint then login as ADMIN user.
-      # The user credentials are located in...
       flaskr/auth0/setup.sh
       ```
     
@@ -833,8 +906,23 @@ These environment variables are located in the setup.sh file.
       # Update the JWT token environment variable with the new JWT token 
       # In flaskr/auth0/setup.sh.
       # Note don't forget to source the file for the update to be configured 
-      export USER_JWT_TOKEN=<NEW JWT TOKEN>
+      source flaskr/auth0/setup.sh
       ```
+
+
+- Notes to developer:
+  - A visit record can only have one vital sign record
+  - A visit record can't be deleted if it has an existing vital sign record
+
+
+- Notes before experimenting with curl commands:
+  - The examples have been organized in the following order in order
+    to provide a smooth experience with the examples
+    - create
+    - update
+    - read
+    - delete
+  
 
 - POST /visits/create
 
@@ -852,7 +940,7 @@ These environment variables are located in the setup.sh file.
   
     ```bash
     curl --request POST --url $BASE_URL/visits/create \
-    --header "Authorization: Bearer $USER_JWT_TOKEN" \
+    --header "Authorization: Bearer $ADMIN_TOKEN" \
     --header "Content-Type: application/json" \
     --data '{"nurse_id":"auth0|60afcac9402eb000684ef198", "patient_id":"auth0|609584b8abea8d006a4dd478"}'
     ```
@@ -872,6 +960,7 @@ These environment variables are located in the setup.sh file.
     }
     ```
 
+
 - POST /vital-signs/create
 
   - General: 
@@ -890,7 +979,7 @@ These environment variables are located in the setup.sh file.
   
     ```bash
     curl --request POST --url $BASE_URL/vital-signs/create \
-    --header "Authorization: Bearer $USER_JWT_TOKEN" \
+    --header "Authorization: Bearer $ADMIN_TOKEN" \
     --header "Content-Type: application/json" \
     --data '{"visit_id":"1", "tempCelsius":"37"}'
     ```
@@ -904,5 +993,225 @@ These environment variables are located in the setup.sh file.
         "visit_id": 1
       }, 
       "success": true
+    }
+    ```
+    
+
+- PATCH /visits/{int:visit_id}
+
+  - General: 
+    - Updates an existing visit record
+  - Variable Rule Argument
+    - visit_id [integer] : Visit record ID from the Visit table
+  - JSON Request Arguments:
+    - nurse_id [string] : AUTH0 ID of nurse to update
+    - patient_id [string] : AUTH0 ID of patient to update
+  - Permission:
+    - PATCH:VISITS
+  - Return: 
+    - Returns a dictionary with information about the recently updated visit record.
+  
+  - Sample Input:
+  
+    ```bash
+    # Update record visit "1" with new patient_id
+    # Keep existing nurse_id by not adding it into the data dictionary
+    curl --request PATCH --url $BASE_URL/visits/1 \
+    --header "Authorization: Bearer $ADMIN_TOKEN" \
+    --header "Content-Type: application/json" \
+    --data '{"patient_id":"auth0|609584e057af210069a6e4f1"}'
+    ```
+  - Output: 
+    
+    ```json
+    {
+      "data": {
+        "id": 1, 
+        "nurse_id": "auth0|60afcac9402eb000684ef198", 
+        "nurse_name": "Jonny Harper, RN", 
+        "patient_id": "auth0|609584e057af210069a6e4f1", 
+        "patient_name": "Cuzco Dog", 
+        "visit_time": "05/28/2021, 03:32:48"
+      }, 
+      "success": true
+    }
+    ```
+
+
+- PATCH /vital-signs/{int:vitalsign_id}
+
+  - General: 
+    - Updates an existing vital sign record
+  - Variable Rule Argument
+    - vitalsign_id [string] : Vital sign unique id number number
+  - JSON Request Arguments:
+    - visit_id [string] : Visit record unique id numerical number to update
+    - tempCelsius [string] : Patient temperature numerical number in celsious to update   
+  - Permission:
+    - PATCH:VITAL-SIGNS
+  - Return: 
+    - Returns a dictionary with information about the recently updated vital sign record.
+  
+  - Sample Input:
+  
+    ```bash
+    # Update record vitalsign "1" with new patient temperature
+    # Keep existing visit_id by not adding it into the data dictionary
+    curl --request PATCH --url $BASE_URL/vital-signs/1 \
+    --header "Authorization: Bearer $ADMIN_TOKEN" \
+    --header "Content-Type: application/json" \
+    --data '{"tempCelsius":"100"}'
+    ```
+  - Output: 
+    
+    ```json
+    {
+      "data": {
+        "id": 1, 
+        "tempCelsius": 100, 
+        "visit_id": 1
+      }, 
+      "success": true
+    }
+    ```
+  
+- GET /patients/search
+
+  - General: 
+    -  Get the visits and vital signs of a requested patient
+  - JSON Request Arguments:
+    - patient_id [string] : AUTH0 ID of patient to get
+  - Permission:
+    - READ:PATIENT-DATA
+  - Return: 
+    - Returns a dictionary with information about the visits and vital signs of the requested patient
+  
+  - Sample Input:
+  
+    ```bash
+    curl --request GET --url $BASE_URL/patients/search \
+    --header "Authorization: Bearer $ADMIN_TOKEN" \
+    --header "Content-Type: application/json" \
+    --data '{"patient_id":"auth0|609584e057af210069a6e4f1"}'
+    ```
+  - Output: 
+    
+    ```json
+    {
+      "data": [
+        {
+          "visit": {
+            "id": 1, 
+            "nurse_id": "auth0|60afcac9402eb000684ef198", 
+            "nurse_name": "Jonny Harper, RN", 
+            "patient_id": "auth0|609584e057af210069a6e4f1", 
+            "patient_name": "Cuzco Dog", 
+            "visit_time": "05/28/2021, 03:32:48"
+          }, 
+          "vitalSign": {
+            "id": 1, 
+            "tempCelsius": 100, 
+            "visit_id": 1
+          }
+        }
+      ], 
+      "success": true
+    }
+
+    ```
+    
+    
+- GET /patients/search/user
+
+  - General: 
+    -  Get the visits and vital signs of a logged in patient user
+  - JSON Request Arguments:
+    - NONE
+  - Permission:
+    - READ:RESTRICTIVE-PATIENT-DATA 
+  - Return: 
+    - Returns a dictionary with information about the visits and vital signs of the active patient user
+  
+  - Sample Input:
+  
+    ```bash
+    curl --request GET --url $BASE_URL/patients/search/user \
+    --header "Authorization: Bearer $PATIENT2_TOKEN"
+    ```
+  - Output: 
+    
+    ```json
+    {
+      "data": [
+        {
+          "visit": {
+            "id": 1, 
+            "nurse_id": "auth0|60afcac9402eb000684ef198", 
+            "nurse_name": "Jonny Harper, RN", 
+            "patient_id": "auth0|609584e057af210069a6e4f1", 
+            "patient_name": "Cuzco Dog", 
+            "visit_time": "05/28/2021, 03:32:48"
+          }, 
+          "vitalSign": {
+            "id": 1, 
+            "tempCelsius": 100, 
+            "visit_id": 1
+          }
+        }
+      ], 
+      "success": true
+    }
+    ```
+  
+
+- DELETE /vital-signs/{int:vitalsign_id}
+
+  - General: 
+    - Deletes an existing vital sign record
+  - Variable Rule Argument
+    - vitalsign_id [string] : Vital sign unique id number number
+  - Permission:
+    - DELETE:VITAL-SIGNS
+  - Return: 
+    - Returns a dictionary with information about the recently deleted vital sign record.
+  
+  - Sample Input:
+  
+    ```bash
+    curl --request DELETE --url $BASE_URL/vital-signs/1 \
+    --header "Authorization: Bearer $ADMIN_TOKEN" 
+    ```
+  - Output: 
+    
+    ```json
+    {
+      "success": true, 
+      "vitalsign_id": 1
+    }
+    ```
+    
+- DELETE /visits/{int:visit_id}
+
+  - General: 
+    - Deletes an existing visit record
+  - Variable Rule Argument
+    - visit_id [integer] : Visit record ID from the Visit table
+  - Permission:
+    - DELETE:VISITS
+  - Return: 
+    - Returns a dictionary with information about the recently deleted visit record.
+  
+  - Sample Input:
+  
+    ```bash
+    curl --request DELETE --url $BASE_URL/visits/1 \
+    --header "Authorization: Bearer $ADMIN_TOKEN" 
+    ```
+  - Output: 
+    
+    ```json
+    {
+      "success": true, 
+      "visit_id": 1
     }
     ```

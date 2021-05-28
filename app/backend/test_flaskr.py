@@ -2,15 +2,9 @@ import unittest
 from flaskr.auth0.authManagementAPI import *
 from flaskr import create_app
 from flaskr.auth0 import auth0LoginMachine
+from flaskr.auth0.auth import get_user_info
 from flaskr.db.models import Visit, VitalSign, db
 from flaskr.db import config
-
-# AUTH0 registered user credentials
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', None)
-NURSE_EMAIL = os.environ.get('NURSE_EMAIL', None)
-PATIENT_1_EMAIL = os.environ.get('PATIENT_1_EMAIL', None)
-PATIENT_2_EMAIL = os.environ.get('PATIENT_2_EMAIL', None)
-USERS_PASSWORD = os.environ.get('USERS_PASSWORD', None)
 
 
 class ApplicationSimulation:
@@ -174,7 +168,7 @@ class ApplicationSimulation:
 
         return data
 
-    def read_patientdata_search(self, patient_id):
+    def search_patient_data(self, patient_id):
         """
         DESCRIPTION: Simulates searching patient medical data
                      from visit and vital sign records
@@ -193,7 +187,7 @@ class ApplicationSimulation:
 
         return data
 
-    def read_patientdata_user(self):
+    def get_patient_user_data(self):
         """
         DESCRIPTION: Simulates active user patient wanting to read their medical data
                      from visit and vital sign records
@@ -214,6 +208,14 @@ class StpRunner(unittest.TestCase):
 
     def setUp(self):
         """Define test variables"""
+        # AUTH0 registered user credentials
+        self.ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', None)
+        self.NURSE_1_EMAIL = os.environ.get('NURSE_1_EMAIL', None)
+        self.NURSE_2_EMAIL = os.environ.get('NURSE_2_EMAIL', None)
+        self.PATIENT_1_EMAIL = os.environ.get('PATIENT_1_EMAIL', None)
+        self.PATIENT_2_EMAIL = os.environ.get('PATIENT_2_EMAIL', None)
+        self.USERS_PASSWORD = os.environ.get('USERS_PASSWORD', None)
+
         builder = Auth0ManagementAPIBuilder()
         self.auth0api = builder.load_base_url(). \
             load_access_token(). \
@@ -227,7 +229,15 @@ class StpRunner(unittest.TestCase):
 
         self.simulate_with_admin_user = ApplicationSimulation. \
             Factory. \
-            login_to_app(ADMIN_EMAIL, USERS_PASSWORD)
+            login_to_app(self.ADMIN_EMAIL, self.USERS_PASSWORD)
+
+        self.simulate_with_nurse_user = ApplicationSimulation. \
+            Factory. \
+            login_to_app(self.NURSE_1_EMAIL, self.USERS_PASSWORD)
+
+        self.simulate_with_patient_user = ApplicationSimulation. \
+            Factory. \
+            login_to_app(self.PATIENT_1_EMAIL, self.USERS_PASSWORD)
 
     def tearDown(self):
         """Executed after reach test"""
@@ -237,6 +247,152 @@ class StpRunner(unittest.TestCase):
         """Quick, feel good, sanity check (no authorization needed)"""
         result = self.simulate_with_non_user.index()
         self.assertEqual(result['success'], True)
+
+    def STP_01(self):
+        """Test software with valid Admin Permissions """
+
+        # get a list of nurse users
+        role = self.auth0api.lut_role(['Nurse'])
+        nurses = self.auth0api.filter_users_by_role(role)
+        nurse = nurses[0]
+
+        # get a list of patient users
+        role = self.auth0api.lut_role(['Patient'])
+        patients = self.auth0api.filter_users_by_role(role)
+        patient = patients[0]
+
+        result_visit = self.simulate_with_admin_user.\
+            create_visit(nurse, patient)
+        self.assertEqual(result_visit['success'], True)
+
+        result_visit = self.simulate_with_admin_user.\
+            update_visit(result_visit['data'].get('id'), patient_id=patient)
+        self.assertEqual(result_visit['success'], True)
+
+        patientTemp = '44'
+        result_vital = self.simulate_with_admin_user.\
+            create_vitalsign(result_visit['data'].get('id'), patientTemp)
+        self.assertEqual(result_vital['success'], True)
+
+        patientTemp = '55'
+        result_vital = self.simulate_with_admin_user.\
+            update_vitalsign(result_vital['data'].get('id'), tempCelsius=patientTemp)
+        self.assertEqual(result_vital['success'], True)
+
+        result = self.simulate_with_admin_user.\
+            search_patient_data(result_visit['data'].get('patient_id'))
+        self.assertEqual(result['success'], True)
+
+        result = self.simulate_with_admin_user.\
+            delete_vitalsign(result_vital['data'].get('id'))
+        self.assertEqual(result['success'], True)
+
+        result = self.simulate_with_admin_user.\
+            delete_visit(result_visit['data'].get('id'))
+        self.assertEqual(result['success'], True)
+
+    def STP_01_a(self):
+        """Test software with unvalid Admin Permissions """
+        result = self.simulate_with_admin_user.\
+            get_patient_user_data()
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'],  'Permission not found.')
+
+    def STP_02(self):
+        """Test software with valid Nurse Permissions """
+        # get a list of nurse users
+        role = self.auth0api.lut_role(['Nurse'])
+        nurses = self.auth0api.filter_users_by_role(role)
+        nurse = nurses[0]
+
+        # get a list of patient users
+        role = self.auth0api.lut_role(['Patient'])
+        patients = self.auth0api.filter_users_by_role(role)
+        patient = patients[0]
+
+        result_visit = self.simulate_with_nurse_user. \
+            create_visit(nurse, patient)
+        self.assertEqual(result_visit['success'], True)
+
+        result_visit = self.simulate_with_nurse_user. \
+            update_visit(result_visit['data'].get('id'), patient_id=patient)
+        self.assertEqual(result_visit['success'], True)
+
+        patientTemp = '44'
+        result_vital = self.simulate_with_nurse_user. \
+            create_vitalsign(result_visit['data'].get('id'), patientTemp)
+        self.assertEqual(result_vital['success'], True)
+
+        patientTemp = '55'
+        result_vital = self.simulate_with_nurse_user. \
+            update_vitalsign(result_vital['data'].get('id'), tempCelsius=patientTemp)
+        self.assertEqual(result_vital['success'], True)
+
+        result = self.simulate_with_nurse_user. \
+            search_patient_data(result_visit['data'].get('patient_id'))
+        self.assertEqual(result['success'], True)
+
+    def STP_03(self):
+        """Test software with unvalid Nurse Permissions """
+        result = self.simulate_with_admin_user.\
+            get_patient_user_data()
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
+
+        result = self.simulate_with_nurse_user. \
+            delete_vitalsign('1')
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
+
+        result = self.simulate_with_nurse_user. \
+            delete_visit('1')
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
+
+    def STP_04(self):
+        """Test software with valid Patient Permissions """
+        result = self.simulate_with_patient_user.\
+            get_patient_user_data()
+        self.assertEqual(result['success'], True)
+
+    def STP_05(self):
+        """Test software with unvalid Patient Permissions """
+        result = self.simulate_with_patient_user. \
+            create_visit('99999', '99999')
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
+
+        result = self.simulate_with_patient_user. \
+            update_visit('99999', patient_id='99999')
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
+
+        patientTemp = '44'
+        result = self.simulate_with_patient_user. \
+            create_vitalsign('99999', patientTemp)
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
+
+        patientTemp = '55'
+        result = self.simulate_with_patient_user. \
+            update_vitalsign('99999', tempCelsius=patientTemp)
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
+
+        result = self.simulate_with_patient_user. \
+            search_patient_data('999999')
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
+
+        result = self.simulate_with_patient_user. \
+            delete_vitalsign('9999')
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
+
+        result = self.simulate_with_patient_user. \
+            delete_visit('999999')
+        self.assertEqual(result['code'], 'unauthorized')
+        self.assertEqual(result['description'], 'Permission not found.')
 
     def STP_06(self):
         """Test software creates visit record"""
@@ -414,24 +570,61 @@ class StpRunner(unittest.TestCase):
         self.assertEqual(result['error'], 422)
 
     def STP_18(self):
-        """Test software gets patient medical record record"""
+        """Test software can search for patient medical records"""
         # get a list of patient users
         role = self.auth0api.lut_role(['Patient'])
         patients_list = self.auth0api.filter_users_by_role(role)
-
-        print(patients_list)
-
         patient_id = patients_list[0]
-        result = self.simulate_with_admin_user.read_patientdata(patient_id)
 
-      #  self.assertEqual(result['success'], True)
-       # self.assertEqual(result['vitalsign_id'], vitalsign.id)
+        result = self.simulate_with_admin_user.search_patient_data(patient_id)
+
+        # verify success
+        self.assertEqual(result['success'], True)
+
+        # verify correct patient was queried
+        for patient in result['data']:
+            visit = patient.get('visit')
+            self.assertEqual(visit['patient_id'], patient_id)
+
+    def STP_19(self):
+        """Test software asserts during a search for patient medical records"""
+        patient_id = '999999'
+
+        result = self.simulate_with_admin_user.search_patient_data(patient_id)
+
+        # verify success
+        self.assertEqual(result['success'], False)
+        self.assertEqual(result['error'], 404)
+
+    def STP_20(self):
+        """Test software can get patient medical records
+           of the active patient user
+           NOTE: Testing whether assertion for getting active patient user profile
+                 is tested with STPs that test user permissions"""
+        result = self.simulate_with_patient_user.get_patient_user_data()
+
+        auth0PatientInfo = get_user_info(self.simulate_with_patient_user.access_token)
+        patient_id_expected = auth0PatientInfo.get('sub')
+
+        # verify success
+        self.assertEqual(result['success'], True)
+
+        # verify active patient user was queried
+        for patient in result['data']:
+            visit = patient.get('visit')
+            self.assertEqual(visit['patient_id'], patient_id_expected)
+
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    '''
     suite.addTest(StpRunner('STP_XX'))
+    suite.addTest(StpRunner('STP_01'))
+    suite.addTest(StpRunner('STP_01_a'))
+    suite.addTest(StpRunner('STP_02'))
+    suite.addTest(StpRunner('STP_03'))
+    suite.addTest(StpRunner('STP_04'))
+    suite.addTest(StpRunner('STP_05'))
     suite.addTest(StpRunner('STP_06'))
     suite.addTest(StpRunner('STP_07'))
     suite.addTest(StpRunner('STP_08'))
@@ -444,8 +637,8 @@ if __name__ == "__main__":
     suite.addTest(StpRunner('STP_15'))
     suite.addTest(StpRunner('STP_16'))
     suite.addTest(StpRunner('STP_17'))
-    '''
-
     suite.addTest(StpRunner('STP_18'))
+    suite.addTest(StpRunner('STP_19'))
+    suite.addTest(StpRunner('STP_20'))
 
     unittest.TextTestRunner().run(suite)

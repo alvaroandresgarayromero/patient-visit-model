@@ -164,18 +164,17 @@ def verify_decode_jwt(token):
 '''
 Gets detailed user information from the user JWT token
 
-INPUT: None
+INPUT: a_token - user token information
 OUTPUT: [dictionary] json data
 
 NOTES:
     GET https://YOUR_DOMAIN/userinfo
     Authorization: 'Bearer {ACCESS_TOKEN}'
 '''
-def get_active_user_info():
+def get_user_info(a_token):
     url = 'https://{}/userinfo'.format(AUTH0_DOMAIN)
 
-    token = get_token_auth_header()
-    bearer_token = 'Bearer {}'.format(token)
+    bearer_token = 'Bearer {}'.format(a_token)
 
     req = Request(url, headers={'Authorization': bearer_token})
     respond = urlopen(req)
