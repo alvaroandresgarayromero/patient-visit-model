@@ -435,7 +435,7 @@ Requirements are organized in three sections where the keyword "context" on requ
         - To run individual tests, follow the ‘STP-XX Requirement’ instructions
       
         ```bash
-        $ python3 -m unittest test_flaskr.PatientVisitTestCase.<STP_XX>
+        $ python3 -m unittest test_flaskr.StpRunner.<STP_XX>
         ```  
       
         - Otherwise, to execute all tests run:
