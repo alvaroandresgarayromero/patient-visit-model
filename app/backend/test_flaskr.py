@@ -32,11 +32,6 @@ class ApplicationSimulation:
         def not_login_to_app():
             return ApplicationSimulation(None)
 
-    def __del__(self):
-        """destructor"""
-        #@todo: investigate pop
-        #self.ctx.pop()
-
     def index(self):
         query = '/'
         server_response = self.client().get(query)
@@ -65,10 +60,12 @@ class ApplicationSimulation:
     def update_visit(self, visit_id, nurse_id=None, patient_id=None):
         """
         DESCRIPTION: Simulates updating an existing visit record
-        INPUT: visit_id [integer]: Visit unique primary ID key of the Visit Table
+        INPUT: visit_id [integer]: Visit unique
+                     primary ID key of the Visit Table
                nurse_id [string, OPTIONAL]: AUTH0 nurse user id
                patient_id [string, OPTIONAL]: AUTH0 patient user id
-        OUTPUT: data [dictionary]: response from query with update data or error
+        OUTPUT: data [dictionary]: response from query
+                      with update data or error
         """
         query = f'/visits/{visit_id}'
         header = {"Authorization": f"Bearer {self.access_token}"}
@@ -92,9 +89,12 @@ class ApplicationSimulation:
 
     def delete_visit(self, visit_id):
         """
-        DESCRIPTION: Simulates deleting an existing visit record
-        INPUT: visit_id [integer]: Visit unique primary ID key of the Visit Table
-        OUTPUT: data [dictionary]: response from query with deleted id or error
+        DESCRIPTION: Simulates deleting an
+                     existing visit record
+        INPUT: visit_id [integer]: Visit unique primary
+                                   ID key of the Visit Table
+        OUTPUT: data [dictionary]: response from query
+                                   with deleted id or error
         """
         query = f'/visits/{visit_id}'
         header = {"Authorization": f"Bearer {self.access_token}"}
@@ -110,7 +110,8 @@ class ApplicationSimulation:
         DESCRIPTION: Simulates creating a new vital sign record
         INPUT: visit_id [integer]: Visit ID record
                tempCelsius [integer]: Patient temperature ( C )
-        OUTPUT: data [dictionary]: response from query with new vital sign or error
+        OUTPUT: data [dictionary]: response from query
+                                   with new vital sign or error
         """
         query = '/vital-signs/create'
         header = {"Authorization": f"Bearer {self.access_token}"}
@@ -131,7 +132,8 @@ class ApplicationSimulation:
                visit_id [integer, OPTIONAL]:  Visit ID record
                tempCelsius [integer, OPTIONAL]:  new patient temperature ( C )
 
-        OUTPUT: data [dictionary]: response from query with updated vital sign or error
+        OUTPUT: data [dictionary]: response from query
+                                with updated vital sign or error
         """
         query = f'/vital-signs/{vitalsign_id}'
         header = {"Authorization": f"Bearer {self.access_token}"}
@@ -156,8 +158,10 @@ class ApplicationSimulation:
     def delete_vitalsign(self, vitalsign_id):
         """
         DESCRIPTION: Simulates deleting an existing vital sign record
-        INPUT: vitalsign_id [integer]: Vital Sign unique primary ID key of the VitalSign Table
-        OUTPUT: data [dictionary]: response from query with deleted id or error
+        INPUT: vitalsign_id [integer]: Vital Sign unique
+                                primary ID key of the VitalSign Table
+        OUTPUT: data [dictionary]: response from
+                                    query with deleted id or error
         """
         query = f'/vital-signs/{vitalsign_id}'
         header = {"Authorization": f"Bearer {self.access_token}"}
@@ -173,7 +177,8 @@ class ApplicationSimulation:
         DESCRIPTION: Simulates searching patient medical data
                      from visit and vital sign records
         INPUT: patient_id [integer]: Patient AUTH0 ID
-        OUTPUT: data [dictionary]: response from query with patient data or error
+        OUTPUT: data [dictionary]: response from
+                                query with patient data or error
         """
         query = f'/patients/search'
         header = {"Authorization": f"Bearer {self.access_token}"}
@@ -189,10 +194,12 @@ class ApplicationSimulation:
 
     def get_patient_user_data(self):
         """
-        DESCRIPTION: Simulates active user patient wanting to read their medical data
+        DESCRIPTION: Simulates active user patient
+                     wanting to read their medical data
                      from visit and vital sign records
         INPUT: NONE
-        OUTPUT: data [dictionary]: response from query with patient data or error
+        OUTPUT: data [dictionary]: response from query
+                                   with patient data or error
         """
         query = f'/patients/search/user'
         header = {"Authorization": f"Bearer {self.access_token}"}
@@ -202,6 +209,7 @@ class ApplicationSimulation:
         data = server_response.get_json()
 
         return data
+
 
 class StpRunner(unittest.TestCase):
     """This class runs the STP tests"""
@@ -244,7 +252,8 @@ class StpRunner(unittest.TestCase):
         pass
 
     def STP_XX(self):
-        """Quick, feel good, sanity check (no authorization needed)"""
+        """Quick, feel good, sanity check
+           (no authorization needed)"""
         result = self.simulate_with_non_user.index()
         self.assertEqual(result['success'], True)
 
@@ -266,17 +275,20 @@ class StpRunner(unittest.TestCase):
         self.assertEqual(result_visit['success'], True)
 
         result_visit = self.simulate_with_admin_user.\
-            update_visit(result_visit['data'].get('id'), patient_id=patient)
+            update_visit(result_visit['data'].get('id'),
+                         patient_id=patient)
         self.assertEqual(result_visit['success'], True)
 
         patientTemp = '44'
         result_vital = self.simulate_with_admin_user.\
-            create_vitalsign(result_visit['data'].get('id'), patientTemp)
+            create_vitalsign(result_visit['data'].get('id'),
+                             patientTemp)
         self.assertEqual(result_vital['success'], True)
 
         patientTemp = '55'
         result_vital = self.simulate_with_admin_user.\
-            update_vitalsign(result_vital['data'].get('id'), tempCelsius=patientTemp)
+            update_vitalsign(result_vital['data'].get('id'),
+                             tempCelsius=patientTemp)
         self.assertEqual(result_vital['success'], True)
 
         result = self.simulate_with_admin_user.\
@@ -315,7 +327,8 @@ class StpRunner(unittest.TestCase):
         self.assertEqual(result_visit['success'], True)
 
         result_visit = self.simulate_with_nurse_user. \
-            update_visit(result_visit['data'].get('id'), patient_id=patient)
+            update_visit(result_visit['data'].get('id'),
+                         patient_id=patient)
         self.assertEqual(result_visit['success'], True)
 
         patientTemp = '44'
@@ -325,7 +338,8 @@ class StpRunner(unittest.TestCase):
 
         patientTemp = '55'
         result_vital = self.simulate_with_nurse_user. \
-            update_vitalsign(result_vital['data'].get('id'), tempCelsius=patientTemp)
+            update_vitalsign(result_vital['data'].get('id'),
+                             tempCelsius=patientTemp)
         self.assertEqual(result_vital['success'], True)
 
         result = self.simulate_with_nurse_user. \
@@ -434,10 +448,12 @@ class StpRunner(unittest.TestCase):
         visit = Visit.query.order_by(Visit.id.desc()).first()
 
         # pick a different patient that is not the visit record queried
-        patients_filtered_list = list(filter(lambda x: x != visit.patient_id, patients_list))
+        patients_filtered_list = list(filter(lambda x: x != visit.patient_id,
+                                             patients_list))
         patient = patients_filtered_list[0]
 
-        result = self.simulate_with_admin_user.update_visit(visit.id, patient_id=patient)
+        result = self.simulate_with_admin_user.update_visit(visit.id,
+                                                            patient_id=patient)
 
         self.assertEqual(result['success'], True)
         self.assertEqual(result['data'].get('patient_id'), patient)
@@ -456,17 +472,22 @@ class StpRunner(unittest.TestCase):
         visits = Visit.query.all()
 
         # find a visit record that has patient vital sign missing/incomplete
-        visists_filtered = list(filter(lambda element: len(element.vitalsigns) == 0, visits))
+        visists_filtered = list(filter(
+            lambda element: len(element.vitalsigns) == 0,
+            visits))
 
         if len(visists_filtered) == 0:
             # list is empty : all visit records have vital signs records
             # create a new visit record with an existing patient
             print('Warning: All visit records have vital signs.'
-                  'Cannot delete existing visit record. Creating new visit record for test')
+                  'Cannot delete existing visit record. '
+                  'Creating new visit record for test')
             tmp_visit = Visit.query.order_by(Visit.id.desc()).first()
-            tmp_result = self.simulate_with_admin_user.create_visit(tmp_visit.nurse_id,
-                                                                    tmp_visit.patient_id)
-            visists_filtered.append(Visit.query.get(tmp_result['data'].get('id')))
+            tmp_result = self.simulate_with_admin_user.\
+                create_visit(tmp_visit.nurse_id, tmp_visit.patient_id)
+            visists_filtered.append(Visit.
+                                    query.
+                                    get(tmp_result['data'].get('id')))
 
         # get one visit record for test
         visit = visists_filtered[0]
@@ -490,7 +511,9 @@ class StpRunner(unittest.TestCase):
         visits = Visit.query.all()
 
         # find a visit record that has patient vital sign missing/incomplete
-        visists_filtered = list(filter(lambda element: len(element.vitalsigns) == 0, visits))
+        visists_filtered = list(filter(
+            lambda element: len(element.vitalsigns) == 0,
+            visits))
 
         if len(visists_filtered) == 0:
             # list is empty : all visit records have vital signs records
@@ -498,9 +521,11 @@ class StpRunner(unittest.TestCase):
             print('Warning: All visit records have vital signs.'
                   ' Creating new visit record for test')
             tmp_visit = Visit.query.order_by(Visit.id.desc()).first()
-            tmp_result = self.simulate_with_admin_user.create_visit(tmp_visit.nurse_id,
-                                                                    tmp_visit.patient_id)
-            visists_filtered.append(Visit.query.get(tmp_result['data'].get('id')))
+            tmp_result = self.simulate_with_admin_user.\
+                create_visit(tmp_visit.nurse_id, tmp_visit.patient_id)
+            visists_filtered.append(Visit.
+                                    query.
+                                    get(tmp_result['data'].get('id')))
 
         # get one visit record for test
         visit = visists_filtered[0]
@@ -508,7 +533,8 @@ class StpRunner(unittest.TestCase):
         # patient temperature
         tempCelsius = 37
 
-        result = self.simulate_with_admin_user.create_vitalsign(visit.id, tempCelsius)
+        result = self.simulate_with_admin_user.\
+            create_vitalsign(visit.id, tempCelsius)
 
         self.assertEqual(result['success'], True)
         self.assertEqual(result['data'].get('tempCelsius'), tempCelsius)
@@ -517,7 +543,8 @@ class StpRunner(unittest.TestCase):
         """Test software asserts during creates vital sign record"""
         visit_id = 999999
         tempCelsius = 37
-        result = self.simulate_with_admin_user.create_vitalsign(visit_id, tempCelsius)
+        result = self.simulate_with_admin_user.\
+            create_vitalsign(visit_id, tempCelsius)
 
         self.assertEqual(result['success'], False)
         self.assertEqual(result['error'], 422)
@@ -528,7 +555,8 @@ class StpRunner(unittest.TestCase):
         vitalsign = VitalSign.query.order_by(VitalSign.id.desc()).first()
         tempCelsius = vitalsign.tempCelsius + 1
 
-        result = self.simulate_with_admin_user.update_vitalsign(vitalsign.id, tempCelsius=tempCelsius)
+        result = self.simulate_with_admin_user.\
+            update_vitalsign(vitalsign.id, tempCelsius=tempCelsius)
 
         self.assertEqual(result['success'], True)
         self.assertEqual(result['data'].get('tempCelsius'), tempCelsius)
@@ -543,8 +571,10 @@ class StpRunner(unittest.TestCase):
 
         # it is not allowed to have one visit with two vital signs records
         # It questions which vital sign is the valid one.
-        # Try to update vital sign record such that two vital signs are from the same visit
-        result = self.simulate_with_admin_user.update_vitalsign(vitalSignOne.id, visit_id=vitalSignTwo.visit_id)
+        # Try to update vital sign record such that
+        # two vital signs are from the same visit
+        result = self.simulate_with_admin_user.\
+            update_vitalsign(vitalSignOne.id, visit_id=vitalSignTwo.visit_id)
 
         self.assertEqual(result['success'], False)
         self.assertEqual(result['error'], 422)
@@ -553,9 +583,11 @@ class StpRunner(unittest.TestCase):
         """Test software deletes vital sign record"""
 
         # get a vital sign record
-        vitalsign = VitalSign.query.order_by(VitalSign.id.desc()).first()
+        vitalsign = VitalSign.query.\
+            order_by(VitalSign.id.desc()).first()
 
-        result = self.simulate_with_admin_user.delete_vitalsign(vitalsign.id)
+        result = self.simulate_with_admin_user.\
+            delete_vitalsign(vitalsign.id)
 
         self.assertEqual(result['success'], True)
         self.assertEqual(result['vitalsign_id'], vitalsign.id)
@@ -564,7 +596,8 @@ class StpRunner(unittest.TestCase):
         """"Test software asserts during deletes vital sign record"""
         vitalsign_id = '99999'
 
-        result = self.simulate_with_admin_user.delete_vitalsign(vitalsign_id)
+        result = self.simulate_with_admin_user.\
+            delete_vitalsign(vitalsign_id)
 
         self.assertEqual(result['success'], False)
         self.assertEqual(result['error'], 422)
@@ -576,7 +609,8 @@ class StpRunner(unittest.TestCase):
         patients_list = self.auth0api.filter_users_by_role(role)
         patient_id = patients_list[0]
 
-        result = self.simulate_with_admin_user.search_patient_data(patient_id)
+        result = self.simulate_with_admin_user.\
+            search_patient_data(patient_id)
 
         # verify success
         self.assertEqual(result['success'], True)
@@ -587,10 +621,12 @@ class StpRunner(unittest.TestCase):
             self.assertEqual(visit['patient_id'], patient_id)
 
     def STP_19(self):
-        """Test software asserts during a search for patient medical records"""
+        """Test software asserts during a search for
+           patient medical records"""
         patient_id = '999999'
 
-        result = self.simulate_with_admin_user.search_patient_data(patient_id)
+        result = self.simulate_with_admin_user.\
+            search_patient_data(patient_id)
 
         # verify success
         self.assertEqual(result['success'], False)
@@ -599,11 +635,14 @@ class StpRunner(unittest.TestCase):
     def STP_20(self):
         """Test software can get patient medical records
            of the active patient user
-           NOTE: Testing whether assertion for getting active patient user profile
+           NOTE: Testing whether assertion for getting
+                 active patient user profile
                  is tested with STPs that test user permissions"""
         result = self.simulate_with_patient_user.get_patient_user_data()
 
-        auth0PatientInfo = get_user_info(self.simulate_with_patient_user.access_token)
+        auth0PatientInfo = get_user_info(self.
+                                         simulate_with_patient_user.
+                                         access_token)
         patient_id_expected = auth0PatientInfo.get('sub')
 
         # verify success

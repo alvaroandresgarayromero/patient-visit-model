@@ -16,7 +16,9 @@ class Config(object):
 
     @property
     def SQLALCHEMY_DATABASE_URI(self):
-        return f'postgresql://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}'
+        return f'postgresql://{self.USER}:{self.PASSWORD}@' \
+                           f'{self.HOST}:{self.PORT}/' \
+                           f'{self.DATABASE}'
 
 
 class ProductionConfig(Config):
@@ -28,7 +30,8 @@ class ProductionConfig(Config):
         # SQLAlchemy 1.4 removed the deprecated postgres:// dialect name,
         # the postgresql must be used now. However, Heroku hasn't updated this
         # on their end. So let's take care of it here.
-        SQLALCHEMY_DATABASE_URI = 'postgresql' + DATABASE_URL_HEROKU.replace('postgres', '')
+        SQLALCHEMY_DATABASE_URI = 'postgresql' + DATABASE_URL_HEROKU.\
+                                                replace('postgres', '')
 
 
 class DevelopmentConfig(Config):
@@ -36,7 +39,6 @@ class DevelopmentConfig(Config):
     HOST = os.environ.get('POSTGRES_CONTAINER_NAME_APP', None)
     PORT = os.environ.get('POSTGRES_PORT_APP', None)
     DEBUG = True
-
 
 
 class TestingConfig(Config):

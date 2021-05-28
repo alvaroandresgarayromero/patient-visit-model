@@ -19,4 +19,3 @@ def init_app(app):
     # $ python3 appserver.py create-db
     for command in [create_db, drop_db]:
         app.cli.add_command(app.cli.command()(command))
-

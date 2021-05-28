@@ -16,8 +16,6 @@ def create_app(a_configclass=config.configs[FLASK_ENVIRONMENT]):
 
     app.config.from_object(a_configclass())
 
-    #print(app.app_context().app.config)
-
     db.init_app(app)
     commands.init_app(app)
 
@@ -25,4 +23,3 @@ def create_app(a_configclass=config.configs[FLASK_ENVIRONMENT]):
     app.register_blueprint(api)
 
     return app
-

@@ -55,6 +55,7 @@ class Visit(db.Model):
     def reset(self):
         db.session.rollback()
 
+
 class VitalSign(db.Model):
     __tablename__ = 'VitalSign'
 

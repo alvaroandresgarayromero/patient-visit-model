@@ -5,17 +5,17 @@ from functools import wraps
 from jose import jwt
 from urllib.request import urlopen, Request
 
-
 AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN', None)
 ALGORITHMS = ['RS256']
 API_AUDIENCE = os.environ.get('AUTH0_AUDIENCE', None)
-
 
 ## AuthError Exception
 '''
 AuthError Exception
 A standardized way to communicate auth failure modes
 '''
+
+
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
@@ -32,6 +32,8 @@ class AuthError(Exception):
         it should raise an AuthError if the header is malformed
     return the token part of the header
 '''
+
+
 def get_token_auth_header():
     auth = request.headers.get('Authorization', None)
 
@@ -72,9 +74,12 @@ def get_token_auth_header():
 
     it should raise an AuthError if permissions are not included in the payload
         !!NOTE check your RBAC settings in Auth0
-    it should raise an AuthError if the requested permission string is not in the payload permissions array
+    it should raise an AuthError if the requested permission
+    string is not in the payload permissions array
     return true otherwise
 '''
+
+
 def check_permissions(permission, payload):
     if 'permissions' not in payload:
         raise AuthError({
@@ -88,6 +93,8 @@ def check_permissions(permission, payload):
             'description': 'Permission not found.'
         }, 401)
     return True
+
+
 '''
 @TODO implement verify_decode_jwt(token) method
     @INPUTS
@@ -99,18 +106,20 @@ def check_permissions(permission, payload):
     it should validate the claims
     return the decoded payload
 
-    !!NOTE urlopen has a common certificate error described here: https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
+    !!NOTE urlopen has a common certificate error described here:
+     https://stackoverflow.com/questions/50236117/scraping-ssl
+     -certificate-verify-failed-error-for-http-en-wikipedia-org
 '''
 
 
 def verify_decode_jwt(token):
-    #print(AUTH0_DOMAIN)
+    # print(AUTH0_DOMAIN)
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
-    #print(json.dumps(jwks, indent=2))
+    # print(json.dumps(jwks, indent=2))
 
     unverified_header = jwt.get_unverified_header(token)
-    #print(json.dumps(unverified_header, indent=2))
+    # print(json.dumps(unverified_header, indent=2))
 
     rsa_key = {}
     if 'kid' not in unverified_header:
@@ -149,7 +158,8 @@ def verify_decode_jwt(token):
         except jwt.JWTClaimsError:
             raise AuthError({
                 'code': 'invalid_claims',
-                'description': 'Incorrect claims. Please, check the audience and issuer.'
+                'description': 'Incorrect claims. Please, check the '
+                               'audience and issuer.'
             }, 401)
         except Exception:
             raise AuthError({
@@ -157,9 +167,10 @@ def verify_decode_jwt(token):
                 'description': 'Unable to parse authentication token.'
             }, 400)
     raise AuthError({
-                'code': 'invalid_header',
-                'description': 'Unable to find the appropriate key.'
-            }, 400)
+        'code': 'invalid_header',
+        'description': 'Unable to find the appropriate key.'
+    }, 400)
+
 
 '''
 Gets detailed user information from the user JWT token
@@ -171,6 +182,8 @@ NOTES:
     GET https://YOUR_DOMAIN/userinfo
     Authorization: 'Bearer {ACCESS_TOKEN}'
 '''
+
+
 def get_user_info(a_token):
     url = 'https://{}/userinfo'.format(AUTH0_DOMAIN)
 
@@ -184,12 +197,12 @@ def get_user_info(a_token):
 
 
 '''
-INPUT: 
+INPUT:
     a_username [string]: email of AUTH0 user
     a_password [string]: password of AUTH0 user
 
 OUTPUT:
-    respond [dict] : token information in dictionary format 
+    respond [dict] : token information in dictionary format
                      where 'access_token' key is the JWT token.
 '''
 
@@ -200,9 +213,13 @@ OUTPUT:
 
     it should use the get_token_auth_header method to get the token
     it should use the verify_decode_jwt method to decode the jwt
-    it should use the check_permissions method validate claims and check the requested permission
-    return the decorator which passes the decoded payload to the decorated method
+    it should use the check_permissions method validate claims
+    and check the requested permission
+    return the decorator which passes the decoded
+    payload to the decorated method
 '''
+
+
 def requires_auth(permission=''):
     def requires_auth_decorator(f):
         @wraps(f)
@@ -213,4 +230,5 @@ def requires_auth(permission=''):
             return f(payload, *args, **kwargs)
 
         return wrapper
+
     return requires_auth_decorator

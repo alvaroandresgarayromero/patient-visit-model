@@ -93,7 +93,6 @@ def update_visit(payload, a_id):
 @api.route('/visits/<int:a_id>', methods=['DELETE'])
 @auth.requires_auth(permission='delete:visits')
 def delete_visit(payload, a_id):
-
     try:
         visit = Visit.query.get(a_id)
 
@@ -162,7 +161,6 @@ def update_vitalsign(payload, a_id):
     except:
         abort(422)
 
-
     return jsonify({'success': True,
                     'data': result})
 
@@ -170,7 +168,6 @@ def update_vitalsign(payload, a_id):
 @api.route('/vital-signs/<int:a_id>', methods=['DELETE'])
 @auth.requires_auth(permission='delete:vital-signs')
 def delete_vitalsigns(payload, a_id):
-
     try:
         vitalsign = VitalSign.query.get(a_id)
 
@@ -197,7 +194,8 @@ def search_patient(payload):
         patient_id = body.get('patient_id')
 
         visits = Visit.query.filter_by(patient_id=patient_id).all()
-        assert visits != [], f'no patients found in visit record with id: {patient_id}'
+        assert visits != [], \
+            f'no patients found in visit record with id: {patient_id}'
 
         result = format_visit_and_vital_sign_data(visits)
 
@@ -214,13 +212,13 @@ def search_patient(payload):
 @api.route('/patients/search/user', methods=['GET'])
 @auth.requires_auth(permission='read:restrictive-patient-data')
 def get_user_patient_record(payload):
-
     try:
         # use decoded payload data to get patient id (active user)
         patient_id = payload.get('sub')
 
         visits = Visit.query.filter_by(patient_id=patient_id).all()
-        assert visits != [], f'no patients found in visit record with id: {patient_id}'
+        assert visits != [], \
+            f'no patients found in visit record with id: {patient_id}'
 
         result = format_visit_and_vital_sign_data(visits)
 
@@ -235,11 +233,13 @@ def get_user_patient_record(payload):
 
 
 '''
-Packages visits and vital sign data 
+Packages visits and vital sign data
 
 INPUT: visits [list] : list of visit objects from Visit class
-OUTPUT: result [list] : Reformatted data 
+OUTPUT: result [list] : Reformatted data
 '''
+
+
 def format_visit_and_vital_sign_data(visits):
     result = []
     for visit in visits:
